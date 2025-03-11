@@ -47,3 +47,17 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+__pycache__/
+*.pyc
+*.pyo
+*.log
+.env
+data/*
+models/*
+notebooks/.ipynb_checkpoints/
+.Rhistory
+.RData
+.Rproj.user/
+.Rproj/
+stock_env/
