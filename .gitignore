@@ -61,3 +61,4 @@ notebooks/.ipynb_checkpoints/
 .Rproj.user/
 .Rproj/
 stock_env/
+.DS_Store
