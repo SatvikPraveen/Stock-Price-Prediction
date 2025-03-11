@@ -81,17 +81,30 @@ server <- function(input, output) {
       ma_period <- input$ma_period
       ma_type <- input$ma_type
       
-      if (ma_type == "SMA") {
-        ma_values <- SMA(stock_data$AAPL.Close, n = ma_period)
-      } else {
-        ma_values <- EMA(stock_data$AAPL.Close, n = ma_period)
+      # Ensure AAPL.Close exists in the stock data
+      if (!"AAPL.Close" %in% colnames(stock_data)) {
+        return(NULL)
       }
       
+      close_prices <- stock_data$AAPL.Close
+      
+      # Compute moving average
+      if (ma_type == "SMA") {
+        ma_values <- SMA(close_prices, n = ma_period)
+      } else {
+        ma_values <- EMA(close_prices, n = ma_period)
+      }
+      
+      # Ensure matching time index
       ma_series <- xts(ma_values, order.by = index(stock_data))
       
-      dygraph(cbind(stock_data$AAPL.Close, ma_series), main = "Moving Average Chart") %>%
-        dySeries("AAPL.Close", label = "Close Price") %>%
-        dySeries("ma_series", label = paste0(ma_type, " (", ma_period, ")"))
+      # Proper column naming
+      combined_series <- cbind(Close = close_prices, MA = ma_series)
+      colnames(combined_series) <- c("Close Price", paste0(ma_type, " (", ma_period, ")"))
+      
+      dygraph(combined_series, main = "Moving Average Chart") %>%
+        dySeries("Close Price", label = "Close Price") %>%
+        dySeries(paste0(ma_type, " (", ma_period, ")"), label = paste0(ma_type, " (", ma_period, ")"))
     } else {
       dygraph(1, main = "No Data Available") %>%
         dyAxis("x", label = "Date") %>%
