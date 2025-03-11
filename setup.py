@@ -70,6 +70,17 @@ def create_virtual_env():
     else:
         print(f"   source {ENV_NAME}/bin/activate")  # Mac/Linux
 
+# Function to install R dependencies
+def install_r_dependencies():
+    print("\n📦 Installing R dependencies from dependencies.R...\n")
+    try:
+        subprocess.run(["Rscript", "dependencies.R"], check=True)
+        print("✅ R dependencies installed successfully!")
+    except subprocess.CalledProcessError:
+        print("❌ Error installing R dependencies. Please check dependencies.R")
+
 if __name__ == "__main__":
     create_project_structure()
     create_virtual_env()
+    install_r_dependencies()
+    
