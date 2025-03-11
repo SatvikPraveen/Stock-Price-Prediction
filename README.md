@@ -101,6 +101,14 @@ This will launch a **web-based interactive dashboard**.
 
 ---
 
+## 🌍 Live App Deployment
+
+Our interactive RShiny app is **live and accessible** at:
+
+🔗 [Stock Market Closing Price Predictor for Apple](https://my-app-01.shinyapps.io/shiny_app/)
+
+Simply visit the link above to explore **historical stock data**, visualize **moving averages**, and predict closing prices based on input values.
+
 ## 💡 **Contributions**
 
 Feel free to open issues, suggest improvements, or contribute by making a pull request.
