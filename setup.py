@@ -11,7 +11,6 @@ PROJECT_STRUCTURE = {
     "notebooks": ["stock_analysis.ipynb"],  # Jupyter notebooks
     "data/raw": [],  # Raw data folder (empty)
     "data/processed": [],  # Processed data folder (empty)
-    "models": [],  # Saved models
     "results": [],  # Analysis outputs
 }
 
