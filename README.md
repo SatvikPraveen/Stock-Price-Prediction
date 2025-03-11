@@ -31,7 +31,7 @@ This project analyzes Apple Inc. (**AAPL**) stock data using **quantitative meth
 ### **1⃣ Clone the Repository**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/stock-price-prediction.git
+git clone https://github.com/SatvikPraveen/stock-price-prediction.git
 cd stock-price-prediction
 ```
 
