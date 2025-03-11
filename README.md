@@ -88,16 +88,27 @@ This will launch a **web-based interactive dashboard**.
 
 ## 🎮 **How the RShiny App Works**
 
-- Uses **Linear Regression** based on Open, High, and Low prices to predict Closing Price.
-- Allows users to visualize **Stock Trends & Moving Averages (SMA, EMA)** dynamically.
-- Fetches **real-time stock data** from Yahoo Finance.
+1. **Fetches Real-Time Data**
+   - Uses `quantmod` to get the latest AAPL stock prices from Yahoo Finance.
+2. **Visualizes Historical Trends**
 
-## 📌 **Next Steps**
+   - Dynamic `dygraphs` plots for stock prices and **customizable moving averages (SMA/EMA)**.
 
-- ✅ Improved UI with tabbed layout and moving averages.
-- ✅ Implemented ARIMA & STLF models for forecasting.
-- 🚀 Consider adding more financial indicators (RSI, Bollinger Bands).
-- 🚀 Deploy the app using ShinyApps.io.
+3. **Predicts Closing Price**
+
+   - A **Linear Regression Model** predicts the **Closing Price** based on user inputs:
+     - Open Price
+     - High Price
+     - Low Price
+
+4. **Interactive UI with Tabbed Layout**
+
+   - **Stock Chart Tab:** Displays historical price trends.
+   - **Moving Average Tab:** Enables SMA/EMA analysis.
+   - **Prediction Tab:** Displays model predictions.
+
+5. **Deployed on ShinyApps.io**
+   - Accessible **from any device** with an internet connection.
 
 ---
 
@@ -107,7 +118,36 @@ Our interactive RShiny app is **live and accessible** at:
 
 🔗 [Stock Market Closing Price Predictor for Apple](https://my-app-01.shinyapps.io/shiny_app/)
 
-Simply visit the link above to explore **historical stock data**, visualize **moving averages**, and predict closing prices based on input values.
+### **📌 How to Use the App**
+
+1. **Explore Stock Trends** – View historical data for AAPL stock.
+2. **Select Moving Averages** – Choose between **SMA** and **EMA** for trend analysis.
+3. **Predict Closing Price** – Input Open, High, and Low prices to get a predicted **Closing Price**.
+
+### **🛠 Troubleshooting Deployment Issues**
+
+- If the app **does not load**, try refreshing the page.
+- If the app is **slow**, it may be due to free-tier ShinyApps.io limitations.
+- If you encounter **errors**, clone the repository and run locally using:
+
+  ```r
+  shiny::runApp("shiny_app")
+  ```
+
+---
+
+## 📌 **Future Improvements**
+
+✅ Improved UI with tabbed layout and moving averages.  
+✅ Implemented ARIMA & STLF models for forecasting.
+
+🚀 **Upcoming Enhancements:**
+
+- **Add More Financial Indicators** – Implement RSI and Bollinger Bands.
+- **Optimize Performance** – Improve app response time for large datasets.
+- **Expand Predictive Modeling** – Integrate deep learning-based models for stock predictions.
+
+---
 
 ## 💡 **Contributions**
 
@@ -115,4 +155,4 @@ Feel free to open issues, suggest improvements, or contribute by making a pull r
 
 ### stock-price-prediction
 
-Stock price prediction using historical data from Yahoo Finance, implemented in R with an interactive RShiny dashboard.
+Stock price prediction using historical data from Yahoo Finance, built with R and an interactive RShiny dashboard.
