@@ -118,6 +118,11 @@ Our interactive RShiny app is **live and accessible** at:
 
 🔗 [Stock Market Closing Price Predictor for Apple](https://my-app-01.shinyapps.io/shiny_app/)
 
+### **📸 Application Interface**
+
+<img width="1096" alt="image" src="https://github.com/user-attachments/assets/37e1b59c-a6f5-411f-8221-fbd978a23661" />
+
+
 ### **📌 How to Use the App**
 
 1. **Explore Stock Trends** – View historical data for AAPL stock.
