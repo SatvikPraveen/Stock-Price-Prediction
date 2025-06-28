@@ -1,5 +1,12 @@
 # 📌 **Stock Price Prediction with RShiny**
 
+![License](https://img.shields.io/github/license/SatvikPraveen/stock-price-prediction)
+![Repo Size](https://img.shields.io/github/repo-size/SatvikPraveen/stock-price-prediction)
+![Issues](https://img.shields.io/github/issues/SatvikPraveen/stock-price-prediction)
+![Stars](https://img.shields.io/github/stars/SatvikPraveen/stock-price-prediction?style=social)
+![R](https://img.shields.io/badge/R-Compatible-blue?logo=r)
+![Shiny](https://img.shields.io/badge/Built%20with-RShiny-75AADB?logo=rstudio)
+
 📈 _Predicting AAPL stock prices using historical data from Yahoo Finance, implemented in R with an interactive RShiny dashboard._
 
 ---
