@@ -21,14 +21,19 @@ This project analyzes Apple Inc. (**AAPL**) stock data using **quantitative meth
 
 ```bash
 📚 stock-price-prediction
- ├── 📜 README.md            <- Project documentation
- ├── 📂 data/                <- Stock data (raw & processed)
- ├── 📂 notebooks/           <- Jupyter/R Markdown notebooks for analysis
- ├── 📂 shiny_app/           <- RShiny dashboard with prediction model
- ├── 📂 results/             <- Forecast plots & evaluation metrics
- ├── 📝 requirements.txt     <- Python dependencies (if needed)
- ├── 📝 dependencies.R       <- R dependencies installation script
- ├── 📝 .gitignore           <- Ignore unnecessary files
+ ├── 📜 README.md                         <- Project documentation
+ ├── 📂 data/                             <- Stock data (raw & processed, ignored)
+ ├── 📂 notebooks/                        <- Jupyter/R Markdown notebooks for analysis
+ ├── 📂 shiny_app/                        <- RShiny dashboard with prediction model
+ ├── 📂 results/                          <- Forecast plots & evaluation metrics
+ ├── 📝 requirements.txt                  <- Python dependencies (if needed)
+ ├── 📝 dependencies.R                    <- R dependencies installation script
+ ├── 📝 .gitignore                        <- Ignore unnecessary files
+ ├── 📜 CODE_OF_CONDUCT.md                <- Community standards and expected contributor behavior
+ ├── 📜 CONTRIBUTING.md                   <- Guidelines for contributing to the project
+ ├── 📝 StockPricePredictionReport.pdf    <- Final project report documenting the analysis, models, and results
+ ├── 📝 setup.py                          <- Python package setup/configuration file
+ ├── 📝 LICENSE                           <- Project license specifying usage and distribution terms
 ```
 
 ---
