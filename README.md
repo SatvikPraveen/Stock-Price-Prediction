@@ -37,6 +37,8 @@ This project analyzes Apple Inc. (**AAPL**) stock data using **quantitative meth
  ├── 📂 notebooks/                        <- Jupyter/R Markdown notebooks for analysis (incl. ARIMA/STLF forecasting)
  ├── 📂 shiny_app/                        <- RShiny dashboard with same-day closing price estimator
  ├── 📂 results/                          <- Forecast plots & evaluation metrics
+ ├── 📂 tests/testthat/                   <- testthat suite for the Shiny app's R functions
+ ├── 📂 .github/workflows/                <- CI workflow running the testthat suite
  ├── 📝 requirements.txt                  <- Python dependencies (if needed)
  ├── 📝 dependencies.R                    <- R dependencies installation script
  ├── 📝 .gitignore                        <- Ignore unnecessary files
@@ -71,6 +73,14 @@ install.packages(c("quantmod", "lubridate", "rvest", "ggplot2", "caret", "lmtest
 
 ```bash
 pip install -r requirements.txt
+```
+
+### **3⃣ Run Tests**
+
+A minimal `testthat` suite covers `fetch_stock_data()` and `train_model()` (see `tests/testthat/`), and runs automatically on every push/PR via GitHub Actions (`.github/workflows/r-tests.yml`). To run it locally:
+
+```r
+testthat::test_dir("tests/testthat")
 ```
 
 ---
