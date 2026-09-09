@@ -1,4 +1,4 @@
-name: R Tests
+name: R Tests & Deploy
 
 on:
   push:
@@ -25,4 +25,69 @@ jobs:
 
       - name: Run tests
         run: testthat::test_dir("tests/testthat", reporter = "summary")
+        shell: Rscript {0}
+
+  deploy:
+    name: Deploy to shinyapps.io
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Only redeploy when shiny_app/ actually changed, so unrelated
+      # commits (README, notebooks, etc.) don't trigger a redeploy.
+      - name: Check whether shiny_app/ changed in this push
+        id: changed
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            shiny_app:
+              - 'shiny_app/**'
+
+      - name: Set up R
+        if: steps.changed.outputs.shiny_app == 'true'
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install rsconnect
+        if: steps.changed.outputs.shiny_app == 'true'
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: any::rsconnect
+
+      # Fail fast with a readable message instead of letting rsconnect
+      # error out cryptically if a secret is missing/misconfigured.
+      - name: Verify shinyapps.io secrets are configured
+        if: steps.changed.outputs.shiny_app == 'true'
+        env:
+          SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
+          SHINYAPPS_TOKEN: ${{ secrets.SHINYAPPS_TOKEN }}
+          SHINYAPPS_SECRET: ${{ secrets.SHINYAPPS_SECRET }}
+        run: |
+          missing=""
+          [ -z "$SHINYAPPS_ACCOUNT" ] && missing="$missing SHINYAPPS_ACCOUNT"
+          [ -z "$SHINYAPPS_TOKEN" ] && missing="$missing SHINYAPPS_TOKEN"
+          [ -z "$SHINYAPPS_SECRET" ] && missing="$missing SHINYAPPS_SECRET"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing required repo secret(s):$missing — add them under Settings > Secrets and variables > Actions before this workflow can deploy."
+            exit 1
+          fi
+
+      - name: Deploy to shinyapps.io
+        if: steps.changed.outputs.shiny_app == 'true'
+        env:
+          SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
+          SHINYAPPS_TOKEN: ${{ secrets.SHINYAPPS_TOKEN }}
+          SHINYAPPS_SECRET: ${{ secrets.SHINYAPPS_SECRET }}
+        run: |
+          rsconnect::setAccountInfo(
+            name = Sys.getenv("SHINYAPPS_ACCOUNT"),
+            token = Sys.getenv("SHINYAPPS_TOKEN"),
+            secret = Sys.getenv("SHINYAPPS_SECRET")
+          )
+          rsconnect::deployApp(appDir = "shiny_app", appName = "shiny_app", forceUpdate = TRUE)
         shell: Rscript {0}

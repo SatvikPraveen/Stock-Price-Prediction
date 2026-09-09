@@ -158,6 +158,18 @@ Our interactive RShiny app is **live and accessible** at:
 
 🔗 [Stock Market Closing Price Predictor for Apple](https://my-app-01.shinyapps.io/shiny_app/)
 
+### **🚀 Deploying Updates**
+
+Pushes to `main` that touch `shiny_app/**` are **automatically deployed** to shinyapps.io via GitHub Actions (`.github/workflows/r-tests.yml`, `deploy` job) — it runs only after the R test suite passes, and only redeploys when the app itself changed. This requires the repo secrets `SHINYAPPS_ACCOUNT`, `SHINYAPPS_TOKEN`, and `SHINYAPPS_SECRET` to be configured under **Settings → Secrets and variables → Actions**; the workflow fails fast with a clear error if any are missing.
+
+For local testing, or as a fallback if you need to deploy without going through CI, you can still deploy manually:
+
+```r
+install.packages("rsconnect")
+rsconnect::setAccountInfo(name = "<your-account>", token = "<your-token>", secret = "<your-secret>")
+rsconnect::deployApp(appDir = "shiny_app", appName = "shiny_app")
+```
+
 ### **📸 Application Interface**
 
 <img width="1096" alt="image" src="https://github.com/user-attachments/assets/37e1b59c-a6f5-411f-8221-fbd978a23661" />
