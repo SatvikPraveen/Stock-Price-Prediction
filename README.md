@@ -92,7 +92,7 @@ pip install -r requirements.txt
 ✔ **Stock Data Extraction** from Yahoo Finance (fetched once per session)  
 ✔ **Moving Averages (SMA & EMA) for Trend Analysis**  
 ✔ **Interactive Dashboard** with stock chart, moving-average chart, and prediction tabs  
-✔ **Same-Day Closing Price Estimation** via linear regression on same-day Open/High/Low (see the caveat above)
+✔ **Same-Day Closing Price Estimation** via linear regression on same-day Open/High/Low, with in-sample R²/RMSE shown alongside the prediction (see the caveat above)
 
 ### Notebook-only exploratory analysis (`notebooks/aapl_stock_analysis.ipynb`)
 
@@ -129,6 +129,7 @@ This will launch a **web-based interactive dashboard**.
      - Open Price
      - High Price
      - Low Price
+   - The Prediction tab also shows the model's in-sample R² and RMSE so you can gauge fit quality, and a caveat noting this is a statistical relationship between same-day OHLC values, not a forward-looking forecast.
 
 4. **Interactive UI with Tabbed Layout**
 
@@ -181,6 +182,7 @@ Our interactive RShiny app is **live and accessible** at:
 - **Add More Financial Indicators** – Implement RSI and Bollinger Bands.
 - **Optimize Performance** – Improve app response time for large datasets.
 - **Expand Predictive Modeling** – Integrate deep learning-based models for stock predictions.
+- **Held-out Model Evaluation** – Add a train/test split for the closing-price regression instead of reporting in-sample R²/RMSE only.
 
 ---
 

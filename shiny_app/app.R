@@ -47,6 +47,7 @@ ui <- fluidPage(
           br(),
           "Predicted Closing Price:",
           h4(textOutput("predicted_closing_price")),
+          helpText(textOutput("model_fit_caption")),
           br(),
           helpText(
             em(
@@ -146,6 +147,19 @@ server <- function(input, output) {
       round(predicted_price, 2)
     } else {
       "N/A"
+    }
+  })
+
+  # Surface in-sample model fit quality alongside the prediction
+  output$model_fit_caption <- renderText({
+    input$predict
+    model <- model_r()
+    if (!is.null(model)) {
+      r_squared <- summary(model)$r.squared
+      rmse <- sqrt(mean(residuals(model)^2))
+      sprintf("R² = %.4f, RMSE = %.2f (in-sample, fit on training data)", r_squared, rmse)
+    } else {
+      ""
     }
   })
 }
