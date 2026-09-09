@@ -15,6 +15,14 @@
 
 This project analyzes Apple Inc. (**AAPL**) stock data using **quantitative methods** and **statistical modeling**. It features an **interactive dashboard built with RShiny** to visualize trends and make predictions.
 
+> ⚠️ **A note on what "prediction" means here:** The RShiny dashboard's linear
+> regression estimates the **same-day** Closing Price from the **same-day**
+> Open, High, and Low prices. Since Close is mathematically bounded between
+> the day's High and Low, this is a demonstration of the statistical
+> relationship between same-day OHLC values — **not** a forward-looking price
+> forecast you could trade on, since in live trading you wouldn't know
+> today's High/Low until the trading day is nearly over.
+
 ---
 
 ## 📚 **Project Structure**
@@ -24,7 +32,7 @@ This project analyzes Apple Inc. (**AAPL**) stock data using **quantitative meth
  ├── 📜 README.md                         <- Project documentation
  ├── 📂 data/                             <- Stock data (raw & processed, ignored)
  ├── 📂 notebooks/                        <- Jupyter/R Markdown notebooks for analysis
- ├── 📂 shiny_app/                        <- RShiny dashboard with prediction model
+ ├── 📂 shiny_app/                        <- RShiny dashboard with same-day closing price estimator
  ├── 📂 results/                          <- Forecast plots & evaluation metrics
  ├── 📝 requirements.txt                  <- Python dependencies (if needed)
  ├── 📝 dependencies.R                    <- R dependencies installation script
@@ -106,9 +114,9 @@ This will launch a **web-based interactive dashboard**.
 
    - Dynamic `dygraphs` plots for stock prices and **customizable moving averages (SMA/EMA)**.
 
-3. **Predicts Closing Price**
+3. **Estimates Same-Day Closing Price**
 
-   - A **Linear Regression Model** predicts the **Closing Price** based on user inputs:
+   - A **Linear Regression Model** estimates the **same-day Closing Price** based on user-provided same-day inputs:
      - Open Price
      - High Price
      - Low Price

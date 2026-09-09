@@ -46,7 +46,17 @@ ui <- fluidPage(
         tabPanel("Prediction",
           br(),
           "Predicted Closing Price:",
-          h4(textOutput("predicted_closing_price"))
+          h4(textOutput("predicted_closing_price")),
+          br(),
+          helpText(
+            em(
+              "Note: This model estimates the same-day Closing Price from the ",
+              "same-day Open, High, and Low prices. Because Close is mathematically ",
+              "bounded between the day's High and Low, this demonstrates the ",
+              "statistical relationship between same-day OHLC values rather than ",
+              "forecasting a future price you could trade on in advance."
+            )
+          )
         )
       ),
       width = 8
