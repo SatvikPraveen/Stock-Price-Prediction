@@ -21,7 +21,10 @@ This project analyzes Apple Inc. (**AAPL**) stock data using **quantitative meth
 > the day's High and Low, this is a demonstration of the statistical
 > relationship between same-day OHLC values — **not** a forward-looking price
 > forecast you could trade on, since in live trading you wouldn't know
-> today's High/Low until the trading day is nearly over.
+> today's High/Low until the trading day is nearly over. The repository's
+> `ARIMA`/`STLF` time-series forecasting (which _does_ forecast future
+> prices) exists only as exploratory analysis in the notebook — see the
+> **Features** section below for the distinction.
 
 ---
 
@@ -31,7 +34,7 @@ This project analyzes Apple Inc. (**AAPL**) stock data using **quantitative meth
 📚 stock-price-prediction
  ├── 📜 README.md                         <- Project documentation
  ├── 📂 data/                             <- Stock data (raw & processed, ignored)
- ├── 📂 notebooks/                        <- Jupyter/R Markdown notebooks for analysis
+ ├── 📂 notebooks/                        <- Jupyter/R Markdown notebooks for analysis (incl. ARIMA/STLF forecasting)
  ├── 📂 shiny_app/                        <- RShiny dashboard with same-day closing price estimator
  ├── 📂 results/                          <- Forecast plots & evaluation metrics
  ├── 📝 requirements.txt                  <- Python dependencies (if needed)
@@ -84,11 +87,17 @@ pip install -r requirements.txt
 
 ## 🛠 **Features**
 
-✔ **Stock Data Extraction** from Yahoo Finance  
-✔ **Exploratory Data Analysis** using ggplot2  
-✔ **Time-Series Forecasting Models (ARIMA, STLF)**  
+### Live on the RShiny dashboard (`shiny_app/app.R`)
+
+✔ **Stock Data Extraction** from Yahoo Finance (fetched once per session)  
 ✔ **Moving Averages (SMA & EMA) for Trend Analysis**  
-✔ **Interactive RShiny Dashboard with Prediction Feature**
+✔ **Interactive Dashboard** with stock chart, moving-average chart, and prediction tabs  
+✔ **Same-Day Closing Price Estimation** via linear regression on same-day Open/High/Low (see the caveat above)
+
+### Notebook-only exploratory analysis (`notebooks/aapl_stock_analysis.ipynb`)
+
+📓 **Exploratory Data Analysis** using ggplot2  
+📓 **Time-Series Forecasting Models (ARIMA, STLF)** — genuine multi-day-ahead forecasts, with RMSE/MAPE/MAE evaluation. This is **not** wired into the live app; it's analysis you can reproduce by running the notebook.
 
 ---
 
@@ -164,10 +173,11 @@ Our interactive RShiny app is **live and accessible** at:
 ## 📌 **Future Improvements**
 
 ✅ Improved UI with tabbed layout and moving averages.  
-✅ Implemented ARIMA & STLF models for forecasting.
+✅ Implemented ARIMA & STLF forecasting models — **in the exploratory notebook only** (`notebooks/aapl_stock_analysis.ipynb`), not in the live RShiny app.
 
 🚀 **Upcoming Enhancements:**
 
+- **Wire ARIMA/STLF into the App** – Add a genuine multi-day "Forecast" tab to the dashboard using the notebook's `forecast`-package models (a real forecasting feature, distinct from the current same-day OHLC estimator).
 - **Add More Financial Indicators** – Implement RSI and Bollinger Bands.
 - **Optimize Performance** – Improve app response time for large datasets.
 - **Expand Predictive Modeling** – Integrate deep learning-based models for stock predictions.
