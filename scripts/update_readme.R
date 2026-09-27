@@ -59,7 +59,7 @@ strat_tbl <- data.frame(
   Model = ps$model,
   `Ann. return` = fmt(ps$ann_return, 3),
   `Ann. vol` = fmt(ps$ann_vol, 3),
-  Sharpe = paste0(fmt(ps$sharpe, 2), " ± ", fmt(ps$sharpe_se, 2)),
+  Sharpe = ifelse(is.na(ps$sharpe), "–", paste0(fmt(ps$sharpe, 2), " ± ", fmt(ps$sharpe_se, 2))),
   `Max DD` = fmt(ps$max_drawdown, 3),
   check.names = FALSE
 )

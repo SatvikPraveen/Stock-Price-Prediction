@@ -24,7 +24,56 @@ Full details, references and limitations: [`docs/methodology.md`](docs/methodolo
 ## Results
 
 <!-- results:start -->
-_Results are being generated; see `results/latest/` once the full run is committed._
+
+Run `full-20260927` at commit `c3c7745`: 10 tickers, forecast origins every trading day from 2013-12-20 to 2026-09-25, parameters refit every 21 days, 833,560 forecasts. All tables are pooled across tickers at h = 1; per-ticker tables, h = 5 and figures are in [`results/latest/`](results/latest/) and the [rendered report](reports/report.Rmd).
+
+**Headline.** 3 of 7 return models beat the random walk at the 5% level (hist_mean, arma_garch, elastic_net); 3 are significantly worse (random_forest, arima, stlf). The best out-of-sample R² is 0.0017 (hist_mean). Against the random walk **with drift** (the expanding-window mean, `hist_mean`), 0 of 6 models are significantly better. For volatility, 3 of 4 models beat the rolling-variance benchmark at the 5% level; the best is **garch11** (QLIKE 1.608 vs 1.727, DM p <0.001).
+
+#### Return forecasts (h = 1, pooled)
+
+| Model | RMSE | OOS R² | Dir. acc. | PT p | DM p vs RW | OOS R² vs drift | DM p vs drift | CRPS | 95% cov. |
+|---|---|---|---|---|---|---|---|---|---|
+| hist_mean | 0.01773 | 0.0017 | 0.532 | 0.210 | 0.001 | – | – | 0.00875 | 0.939 |
+| arma_garch | 0.01773 | 0.0017 | 0.532 | n/a | 0.010 | -0.0000 | 0.799 | 0.00859 | 0.945 |
+| elastic_net | 0.01773 | 0.0016 | 0.530 | 0.260 | 0.018 | -0.0001 | 0.828 | 0.00877 | 0.937 |
+| naive_zero | 0.01774 | 0.0000 | – | n/a | n/a | -0.0017 | 0.001 | 0.00876 | 0.939 |
+| ets | 0.01775 | -0.0006 | 0.503 | 0.227 | 0.601 | -0.0024 | 0.074 | 0.00878 | 0.937 |
+| random_forest | 0.01799 | -0.0279 | 0.507 | 0.361 | <0.001 | -0.0296 | <0.001 | 0.00892 | 0.937 |
+| arima | 0.01812 | -0.0429 | 0.521 | 0.054 | <0.001 | -0.0447 | <0.001 | 0.00889 | 0.935 |
+| stlf | 0.02139 | -0.4537 | 0.493 | 0.202 | <0.001 | -0.4562 | <0.001 | 0.01106 | 0.874 |
+
+`OOS R²` is relative to the zero-return random walk (Campbell-Thompson) or to the random walk with drift; `DM p` is the two-sided Diebold-Mariano p-value with the HLN correction; `PT p` is the Pesaran-Timmermann directional test (undefined when a model's forecast sign never changes); `CRPS` scores the Gaussian predictive distribution.
+
+#### Variance forecasts (h = 1, pooled)
+
+| Model | QLIKE (r²) | DM p (r²) | QLIKE (GK) | DM p (GK) |
+|---|---|---|---|---|
+| garch11 | 1.6075 | <0.001 | 0.4204 | <0.001 |
+| ewma | 1.6509 | <0.001 | 0.4199 | <0.001 |
+| har_gk | 1.6712 | <0.001 | 0.3111 | <0.001 |
+| hist_var | 1.7266 | n/a | 0.4490 | n/a |
+| har_r2 | 2.1201 | <0.001 | 1.1972 | <0.001 |
+
+QLIKE is reported against squared returns (r², unbiased proxy) and Garman-Klass realised variance (GK, precise but excludes overnight moves); DM tests are against `hist_var`.
+
+#### Trading backtest (long/flat, 5 bp costs, equal-weight, h = 1)
+
+| Model | Ann. return | Ann. vol | Sharpe | Max DD |
+|---|---|---|---|---|
+| hist_mean | 0.188 | 0.182 | 1.03 ± 0.35 | 0.282 |
+| buy_hold | 0.192 | 0.187 | 1.03 ± 0.35 | 0.311 |
+| arma_garch | 0.192 | 0.187 | 1.03 ± 0.35 | 0.311 |
+| elastic_net | 0.182 | 0.178 | 1.02 ± 0.35 | 0.280 |
+| arima | 0.113 | 0.140 | 0.80 ± 0.32 | 0.213 |
+| random_forest | 0.085 | 0.125 | 0.68 ± 0.31 | 0.203 |
+| ets | 0.061 | 0.121 | 0.51 ± 0.30 | 0.239 |
+| stlf | 0.059 | 0.122 | 0.48 ± 0.30 | 0.192 |
+| naive_zero | 0.000 | 0.000 | – | 0.000 |
+
+Sharpe ratios are annualised with Lo (2002) standard errors. `hist_mean` is almost always long, so it tracks buy-and-hold minus costs; `naive_zero` never trades.
+
+![Cumulative squared-error difference vs. random walk](results/latest/figures/cumulative_sse_h1.png)
+
 <!-- results:end -->
 
 ## Why this matters
@@ -89,6 +138,8 @@ dm_test(e1, e2, h = 5)                             # Diebold-Mariano with HLN co
 Adding a model is one constructor returning `new_model()`; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Dashboard
+
+![Forecast tab of the deployed dashboard](docs/app-forecast-tab.jpg)
 
 The [live dashboard](https://stock-prediction-app.shinyapps.io/stockcast/) (auto-deployed from `main` after CI passes) lets you pick any ticker in the snapshot or download one live, view prices with moving averages and Bollinger bands, produce a genuine `h`-day-ahead price forecast with a 95% interval from any registered model next to the random-walk benchmark, compare GARCH conditional volatility with realised volatility, and browse the walk-forward leaderboards and tests.
 

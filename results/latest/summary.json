@@ -1,7 +1,7 @@
 {
   "run_id": "full-20260927",
-  "git_sha": "143ffde",
-  "finished_at": "2026-09-27T00:40:53-0400",
+  "git_sha": "c3c7745",
+  "finished_at": "2026-09-27T01:13:05-0400",
   "n_tickers": 10,
   "tickers": ["AAPL", "MSFT", "AMZN", "GOOGL", "NVDA", "JPM", "XOM", "JNJ", "PG", "SPY"],
   "horizons": [1, 5],
