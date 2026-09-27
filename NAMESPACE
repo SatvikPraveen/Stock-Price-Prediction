@@ -61,3 +61,8 @@ importFrom(utils,
   tail,
   write.csv
 )
+importFrom(xts,xts)
+importFrom(zoo,
+  coredata,
+  index
+)

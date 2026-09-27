@@ -19,6 +19,8 @@
 #'   dnorm pt setNames acf median
 #' @importFrom utils read.csv write.csv head tail packageVersion sessionInfo
 #' @importFrom ggplot2 .data
+#' @importFrom xts xts
+#' @importFrom zoo index coredata
 "_PACKAGE"
 
 # Feature column names produced by make_features(); kept here so that models
