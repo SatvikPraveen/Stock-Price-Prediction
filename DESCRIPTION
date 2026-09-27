@@ -1,0 +1,50 @@
+Package: stockcast
+Title: Walk-Forward Evaluation of Daily Equity Return and Volatility Forecasts
+Version: 1.0.0
+Authors@R:
+    person("Satvik", "Praveen", email = "satvikpraveen@usf.edu", role = c("aut", "cre"))
+Description: A reproducible research framework for forecasting daily equity
+    log returns and realised variance. Implements a strictly out-of-sample
+    rolling-origin (walk-forward) evaluation with periodic refitting, a
+    registry of statistical and machine-learning forecasters (random walk,
+    historical mean, ARIMA, ETS, STL-ETS, elastic net, random forest,
+    ARMA-GARCH, EWMA, HAR-RV), proper scoring rules (RMSE, MAE,
+    out-of-sample R-squared, CRPS, Winkler score, QLIKE), formal tests of
+    predictive ability (Diebold-Mariano with Harvey-Leybourne-Newbold
+    correction, Pesaran-Timmermann directional test), and an economic
+    evaluation via a transaction-cost-aware trading backtest.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.2)
+Imports:
+    digest,
+    forecast,
+    furrr,
+    future,
+    ggplot2,
+    glmnet,
+    jsonlite,
+    quantmod,
+    ranger,
+    rugarch,
+    stats,
+    TTR,
+    utils,
+    xts,
+    yaml,
+    zoo
+Suggests:
+    bslib,
+    DT,
+    dygraphs,
+    knitr,
+    lintr,
+    rmarkdown,
+    shiny,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+URL: https://github.com/SatvikPraveen/Stock-Price-Prediction
+BugReports: https://github.com/SatvikPraveen/Stock-Price-Prediction/issues
+Config/roxygen2/version: 8.1.0

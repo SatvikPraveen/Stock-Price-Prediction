@@ -53,8 +53,19 @@ __pycache__/
 *.pyo
 *.log
 .env
+# Raw downloads are ignored, but the hashed snapshot used by experiments is committed
 data/*
+!data/snapshot/
 models/*
+results/runs/
+shiny_app/R/
+shiny_app/data/
+shiny_app/results/
+reports/*.html
+reports/*_files/
+reports/*.pdf
+*.Rcheck/
+stockcast_*.tar.gz
 notebooks/.ipynb_checkpoints/
 .Rhistory
 .RData
