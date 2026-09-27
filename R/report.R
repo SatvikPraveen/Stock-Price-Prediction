@@ -149,7 +149,9 @@ summarise_run <- function(run_dir, latest_dir = "results/latest", cost_bps = 5) 
     models_beating_rw_h1_p05 = if (nrow(pooled_ret)) {
       sig <- !is.na(pooled_ret$dm_p) & pooled_ret$dm_p < 0.05 & pooled_ret$oos_r2 > 0
       pooled_ret$model[sig]
-    } else character(0)
+    } else {
+      character(0)
+    }
   )
   jsonlite::write_json(summary, file.path(run_dir, "summary.json"),
                        auto_unbox = TRUE, pretty = TRUE)

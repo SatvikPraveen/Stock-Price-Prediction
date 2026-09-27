@@ -47,7 +47,11 @@ test_that("hist_mean beats naive_zero on a series with a strong drift", {
   x <- synthetic_prices(900, seed = 9)
   # inject a large, persistent drift so the mean is genuinely predictable
   adj <- as.numeric(x$Adjusted) * exp(0.01 * seq_len(900))
-  x$Adjusted <- adj; x$Close <- adj; x$Open <- adj; x$High <- adj * 1.01; x$Low <- adj * 0.99
+  x$Adjusted <- adj
+  x$Close <- adj
+  x$Open <- adj
+  x$High <- adj * 1.01
+  x$Low <- adj * 0.99
   feat <- make_features(x)
   fc <- walk_forward(feat, get_models(c("naive_zero", "hist_mean")),
                      h = 1, initial = 500, step = 1)

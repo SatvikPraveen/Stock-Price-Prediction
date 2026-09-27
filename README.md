@@ -1,217 +1,103 @@
-# 📌 **Stock Price Prediction with RShiny**
+# stockcast: out-of-sample forecasting of daily equity returns and volatility
 
+[![R package CI](https://github.com/SatvikPraveen/Stock-Price-Prediction/actions/workflows/r-tests.yml/badge.svg)](https://github.com/SatvikPraveen/Stock-Price-Prediction/actions/workflows/r-tests.yml)
 ![License](https://img.shields.io/github/license/SatvikPraveen/stock-price-prediction)
-![Repo Size](https://img.shields.io/github/repo-size/SatvikPraveen/stock-price-prediction)
-![Issues](https://img.shields.io/github/issues/SatvikPraveen/stock-price-prediction)
-![Stars](https://img.shields.io/github/stars/SatvikPraveen/stock-price-prediction?style=social)
-![R](https://img.shields.io/badge/R-Compatible-blue?logo=r)
-![Shiny](https://img.shields.io/badge/Built%20with-RShiny-75AADB?logo=rstudio)
+![R](https://img.shields.io/badge/R-%E2%89%A5%204.2-blue?logo=r)
+[![Live app](https://img.shields.io/badge/Shiny-live%20dashboard-75AADB?logo=rstudio)](https://my-app-01.shinyapps.io/shiny_app/)
 
-📈 _Predicting AAPL stock prices using historical data from Yahoo Finance, implemented in R with an interactive RShiny dashboard._
+A reproducible research framework, packaged as R package **`stockcast`**, that asks a precise question:
+**can standard statistical and machine-learning models forecast next-day equity returns better than a random walk once the evaluation is genuinely out of sample, and how well can their variance be forecast?**
 
----
+Every number in this README is produced by `make experiment` from a pinned data snapshot, scored with proper scoring rules, and tested against a benchmark with formal statistics. Nothing is fitted in-sample and reported as a forecast.
 
-## 🚀 **Project Overview**
+## What the study does
 
-This project analyzes Apple Inc. (**AAPL**) stock data using **quantitative methods** and **statistical modeling**. It features an **interactive dashboard built with RShiny** to visualize trends and make predictions.
+- **Data.** Daily OHLCV for 10 large-cap US names and SPY, 2010 to 2026, from Yahoo Finance, pinned to SHA-256-hashed CSVs in [`data/snapshot/`](data/snapshot/) so that a run is bit-for-bit reproducible.
+- **Targets.** `h`-day cumulative log returns (`h` = 1, 5) and their variance, proxied by squared returns and Garman-Klass realised variance from OHLC.
+- **Models.** Eight return forecasters (random walk, drift, ARIMA, ETS, STL-ETS, elastic net, random forest, ARMA-GARCH) and five variance forecasters (rolling variance, EWMA, GARCH(1,1), two HAR-RV variants), all behind one `fit()` / `predict()` interface.
+- **Protocol.** Rolling-origin walk-forward with an origin on **every trading day** (about 3,200 per ticker), parameters refit monthly and frozen in between, realised targets attached only from the future window. Failures are caught per origin instead of aborting the run.
+- **Scoring.** RMSE, MAE, Campbell-Thompson out-of-sample R², CRPS, interval coverage and Winkler score for returns; QLIKE and MSE for variance. **Diebold-Mariano** tests (HLN small-sample correction, overlap-aware) against the benchmark and the **Pesaran-Timmermann** directional test.
+- **Economics.** Long/flat and long/short strategies from the sign of the forecast with 5 bp transaction costs; Sharpe ratios with Lo (2002) standard errors, drawdowns and turnover, against buy-and-hold.
 
-> ⚠️ **A note on what "prediction" means here:** The RShiny dashboard's linear
-> regression estimates the **same-day** Closing Price from the **same-day**
-> Open, High, and Low prices. Since Close is mathematically bounded between
-> the day's High and Low, this is a demonstration of the statistical
-> relationship between same-day OHLC values — **not** a forward-looking price
-> forecast you could trade on, since in live trading you wouldn't know
-> today's High/Low until the trading day is nearly over. The repository's
-> `ARIMA`/`STLF` time-series forecasting (which _does_ forecast future
-> prices) exists only as exploratory analysis in the notebook — see the
-> **Features** section below for the distinction.
+Full details, references and limitations: [`docs/methodology.md`](docs/methodology.md).
 
----
+## Results
 
-## 📚 **Project Structure**
+<!-- results:start -->
+_Results are being generated; see `results/latest/` once the full run is committed._
+<!-- results:end -->
+
+## Why this matters
+
+The project started as a Shiny app that "predicted" the closing price from the same day's open, high and low, plus a notebook whose ARIMA/STLF comparison scored a 30-day-ahead forecast against the *last 30 days of its own training data* (a MAPE of about 1% that meant nothing). The rebuild keeps the STL-ETS specification in the model registry precisely so the difference between an in-sample number and a walk-forward one is visible: under a valid protocol it is significantly worse than a random walk. The old outputs are preserved in [`results/legacy_notebook/`](results/legacy_notebook/) and the notebook carries an explanatory note.
+
+## Repository layout
+
+```
+R/                      package source: data, features, models, backtest, metrics, strategy, report
+tests/testthat/         unit tests on synthetic data (no network), plus a headless test of the app
+config/                 experiment.yml (full) and quick.yml (smoke)
+scripts/                snapshot_data.R, run_experiment.R, render_report.R, update_readme.R
+data/snapshot/          pinned OHLCV CSVs + MANIFEST.json with SHA-256 hashes
+results/latest/         tables, figures and provenance of the committed run
+results/runs/<id>/      every run (git-ignored): forecasts.rds, config, sessionInfo, provenance
+reports/report.Rmd      auto-generated HTML report
+shiny_app/              bslib dashboard
+docs/methodology.md     protocol, metrics, references
+Dockerfile, Makefile    reproducible environment and entry points
+```
+
+## Reproduce
 
 ```bash
-📚 stock-price-prediction
- ├── 📜 README.md                         <- Project documentation
- ├── 📂 data/                             <- Stock data (raw & processed, ignored)
- ├── 📂 notebooks/                        <- Jupyter/R Markdown notebooks for analysis (incl. ARIMA/STLF forecasting)
- ├── 📂 shiny_app/                        <- RShiny dashboard with same-day closing price estimator
- ├── 📂 results/                          <- Forecast plots & evaluation metrics
- ├── 📂 tests/testthat/                   <- testthat suite for the Shiny app's R functions
- ├── 📂 .github/workflows/                <- CI workflow running the testthat suite
- ├── 📝 requirements.txt                  <- Python dependencies (if needed)
- ├── 📝 dependencies.R                    <- R dependencies installation script
- ├── 📝 .gitignore                        <- Ignore unnecessary files
- ├── 📜 CODE_OF_CONDUCT.md                <- Community standards and expected contributor behavior
- ├── 📜 CONTRIBUTING.md                   <- Guidelines for contributing to the project
- ├── 📝 StockPricePredictionReport.pdf    <- Final project report documenting the analysis, models, and results
- ├── 📝 setup.py                          <- Python package setup/configuration file
- ├── 📝 LICENSE                           <- Project license specifying usage and distribution terms
+git clone https://github.com/SatvikPraveen/Stock-Price-Prediction.git
+cd Stock-Price-Prediction
+make deps          # R >= 4.2; installs everything in DESCRIPTION via pak
+make install       # needed so parallel workers can load the package
+make test          # 60+ tests, no network required
+make quick         # ~5-minute smoke run: 2 tickers, weekly origins
+make experiment    # full run: ~50 minutes on 8-9 cores
+make report        # reports/report.html from results/latest
+make app           # launch the dashboard locally
 ```
 
----
-
-## 🔧 **Setup Instructions**
-
-### **1⃣ Clone the Repository**
+Or, with nothing but Docker installed:
 
 ```bash
-git clone https://github.com/SatvikPraveen/stock-price-prediction.git
-cd stock-price-prediction
+make docker && make docker-run
 ```
 
-### **2⃣ Install Dependencies**
+To refresh the data (this changes every result, so treat it as a new experiment): `make data`.
 
-#### **For R users:**
+### Compute requirements
+
+The full experiment is about 830,000 forecasts and takes roughly 50 minutes on a 10-core laptop with 9 `future` workers; no GPU or cluster is needed. The work is embarrassingly parallel over (ticker, horizon) tasks, so scaling to hundreds of tickers or intraday data only requires pointing `future::plan()` at a cluster backend such as `future.batchtools` for SLURM.
+
+## Using the package
 
 ```r
-# Install required R packages
-install.packages(c("quantmod", "lubridate", "rvest", "ggplot2", "caret", "lmtest", "tseries", "shiny", "dygraphs", "TTR"))
+library(stockcast)
+prices <- get_prices("AAPL")                       # from the snapshot; refresh = TRUE to download
+feat   <- make_features(prices$AAPL)               # strictly lagged predictors
+fc     <- walk_forward(feat, get_models(c("naive_zero", "arima", "garch11")),
+                       h = 1, initial = 1000, step = 1, refit_every = 21)
+evaluate_forecasts(fc)                             # RMSE, OOS R², DM and PT tests, CRPS, QLIKE ...
+backtest_strategy(fc, cost_bps = 5)                # Sharpe, drawdown vs buy-and-hold
+dm_test(e1, e2, h = 5)                             # Diebold-Mariano with HLN correction
 ```
 
-#### **For Python users (if using Jupyter for analysis):**
+Adding a model is one constructor returning `new_model()`; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-```bash
-pip install -r requirements.txt
-```
+## Dashboard
 
-### **3⃣ Run Tests**
+The [live dashboard](https://my-app-01.shinyapps.io/shiny_app/) (auto-deployed from `main` after CI passes) lets you pick any ticker in the snapshot or download one live, view prices with moving averages and Bollinger bands, produce a genuine `h`-day-ahead price forecast with a 95% interval from any registered model next to the random-walk benchmark, compare GARCH conditional volatility with realised volatility, and browse the walk-forward leaderboards and tests.
 
-A minimal `testthat` suite covers `fetch_stock_data()` and `train_model()` (see `tests/testthat/`), and runs automatically on every push/PR via GitHub Actions (`.github/workflows/r-tests.yml`). To run it locally:
+## Citation
 
-```r
-testthat::test_dir("tests/testthat")
-```
+If you use this code or its results, please cite it (see [`CITATION.cff`](CITATION.cff)):
 
----
+> Praveen, S. (2026). *stockcast: walk-forward evaluation of daily equity return and volatility forecasts* (v1.0.0). https://github.com/SatvikPraveen/Stock-Price-Prediction
 
-## 📊 **Data Source**
+## License
 
-- The stock price data is retrieved from **Yahoo Finance** using the `quantmod` package in R.
-- The dataset contains:
-  - **Date**
-  - **Open, High, Low, Close Prices**
-  - **Volume & Adjusted Close**
-
----
-
-## 🛠 **Features**
-
-### Live on the RShiny dashboard (`shiny_app/app.R`)
-
-✔ **Stock Data Extraction** from Yahoo Finance (fetched once per session)  
-✔ **Moving Averages (SMA & EMA) for Trend Analysis**  
-✔ **Interactive Dashboard** with stock chart, moving-average chart, and prediction tabs  
-✔ **Same-Day Closing Price Estimation** via linear regression on same-day Open/High/Low, with in-sample R²/RMSE shown alongside the prediction (see the caveat above)
-
-### Notebook-only exploratory analysis (`notebooks/aapl_stock_analysis.ipynb`)
-
-📓 **Exploratory Data Analysis** using ggplot2  
-📓 **Time-Series Forecasting Models (ARIMA, STLF)** — genuine multi-day-ahead forecasts, with RMSE/MAPE/MAE evaluation. This is **not** wired into the live app; it's analysis you can reproduce by running the notebook.
-
----
-
-## 🎮 **How to Run the RShiny App**
-
-```r
-# Navigate to the shiny_app directory
-cd shiny_app
-
-# Run the app
-shiny::runApp()
-```
-
-This will launch a **web-based interactive dashboard**.
-
----
-
-## 🎮 **How the RShiny App Works**
-
-1. **Fetches Real-Time Data**
-   - Uses `quantmod` to get the latest AAPL stock prices from Yahoo Finance.
-2. **Visualizes Historical Trends**
-
-   - Dynamic `dygraphs` plots for stock prices and **customizable moving averages (SMA/EMA)**.
-
-3. **Estimates Same-Day Closing Price**
-
-   - A **Linear Regression Model** estimates the **same-day Closing Price** based on user-provided same-day inputs:
-     - Open Price
-     - High Price
-     - Low Price
-   - The Prediction tab also shows the model's in-sample R² and RMSE so you can gauge fit quality, and a caveat noting this is a statistical relationship between same-day OHLC values, not a forward-looking forecast.
-
-4. **Interactive UI with Tabbed Layout**
-
-   - **Stock Chart Tab:** Displays historical price trends.
-   - **Moving Average Tab:** Enables SMA/EMA analysis.
-   - **Prediction Tab:** Displays model predictions.
-
-5. **Deployed on ShinyApps.io**
-   - Accessible **from any device** with an internet connection.
-
----
-
-## 🌍 Live App Deployment
-
-Our interactive RShiny app is **live and accessible** at:
-
-🔗 [Stock Market Closing Price Predictor for Apple](https://my-app-01.shinyapps.io/shiny_app/)
-
-### **🚀 Deploying Updates**
-
-Pushes to `main` that touch `shiny_app/**` are **automatically deployed** to shinyapps.io via GitHub Actions (`.github/workflows/r-tests.yml`, `deploy` job) — it runs only after the R test suite passes, and only redeploys when the app itself changed. This requires the repo secrets `SHINYAPPS_ACCOUNT`, `SHINYAPPS_TOKEN`, and `SHINYAPPS_SECRET` to be configured under **Settings → Secrets and variables → Actions**; the workflow fails fast with a clear error if any are missing.
-
-For local testing, or as a fallback if you need to deploy without going through CI, you can still deploy manually:
-
-```r
-install.packages("rsconnect")
-rsconnect::setAccountInfo(name = "<your-account>", token = "<your-token>", secret = "<your-secret>")
-rsconnect::deployApp(appDir = "shiny_app", appName = "shiny_app")
-```
-
-### **📸 Application Interface**
-
-<img width="1096" alt="image" src="https://github.com/user-attachments/assets/37e1b59c-a6f5-411f-8221-fbd978a23661" />
-
-
-### **📌 How to Use the App**
-
-1. **Explore Stock Trends** – View historical data for AAPL stock.
-2. **Select Moving Averages** – Choose between **SMA** and **EMA** for trend analysis.
-3. **Predict Closing Price** – Input Open, High, and Low prices to get a predicted **Closing Price**.
-
-### **🛠 Troubleshooting Deployment Issues**
-
-- If the app **does not load**, try refreshing the page.
-- If the app is **slow**, it may be due to free-tier ShinyApps.io limitations.
-- If you encounter **errors**, clone the repository and run locally using:
-
-  ```r
-  shiny::runApp("shiny_app")
-  ```
-
----
-
-## 📌 **Future Improvements**
-
-✅ Improved UI with tabbed layout and moving averages.  
-✅ Implemented ARIMA & STLF forecasting models — **in the exploratory notebook only** (`notebooks/aapl_stock_analysis.ipynb`), not in the live RShiny app.
-
-🚀 **Upcoming Enhancements:**
-
-- **Wire ARIMA/STLF into the App** – Add a genuine multi-day "Forecast" tab to the dashboard using the notebook's `forecast`-package models (a real forecasting feature, distinct from the current same-day OHLC estimator).
-- **Add More Financial Indicators** – Implement RSI and Bollinger Bands.
-- **Optimize Performance** – Improve app response time for large datasets.
-- **Expand Predictive Modeling** – Integrate deep learning-based models for stock predictions.
-- **Held-out Model Evaluation** – Add a train/test split for the closing-price regression instead of reporting in-sample R²/RMSE only.
-
----
-
-## 💡 **Contributions**
-
-Feel free to open issues, suggest improvements, or contribute by making a pull request.
-
-### stock-price-prediction
-
-Stock price prediction using historical data from Yahoo Finance, built with R and an interactive RShiny dashboard.
+MIT. See [`LICENSE.md`](LICENSE.md).

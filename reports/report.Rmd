@@ -21,7 +21,7 @@ ret <- read.csv(file.path(rd, "leaderboard_return.csv"))
 vol <- read.csv(file.path(rd, "leaderboard_volatility.csv"))
 strat <- read.csv(file.path(rd, "strategy.csv"))
 fmt <- function(x, d = 4) formatC(x, digits = d, format = "f")
-pval <- function(p) ifelse(is.na(p), "", ifelse(p < 0.001, "<0.001", fmt(p, 3)))
+pval <- function(p) ifelse(is.na(p), "n/a", ifelse(p < 0.001, "<0.001", fmt(p, 3)))
 pooled_ret <- ret[ret$ticker == "POOLED", ]
 pooled_vol <- vol[vol$ticker == "POOLED", ]
 ```

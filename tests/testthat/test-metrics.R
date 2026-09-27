@@ -1,5 +1,6 @@
 test_that("point losses match hand computations", {
-  a <- c(1, 2, 3); p <- c(1, 1, 5)
+  a <- c(1, 2, 3)
+  p <- c(1, 1, 5)
   expect_equal(rmse(a, p), sqrt(mean(c(0, 1, 4))))
   expect_equal(mae(a, p), 1)
   expect_equal(oos_r2(a, p, rep(0, 3)), 1 - 5 / 14)
@@ -32,7 +33,8 @@ test_that("qlike is zero at a perfect forecast and positive otherwise", {
 
 test_that("dm_test matches forecast::dm.test for h = 1 and h = 4", {
   set.seed(11)
-  e1 <- rnorm(250); e2 <- rnorm(250, sd = 1.15)
+  e1 <- rnorm(250)
+  e2 <- rnorm(250, sd = 1.15)
   for (h in c(1, 4)) {
     mine <- dm_test(e1, e2, h = h)
     ref <- forecast::dm.test(e1, e2, h = h, power = 2)
@@ -46,7 +48,8 @@ test_that("dm_test matches forecast::dm.test for h = 1 and h = 4", {
 
 test_that("dm_test accepts a custom loss and handles degenerate input", {
   set.seed(2)
-  l1 <- rexp(100); l2 <- rexp(100)
+  l1 <- rexp(100)
+  l2 <- rexp(100)
   out <- dm_test(l1, l2, loss = function(v) v)
   expect_equal(out$mean_diff, mean(l1 - l2))
   expect_true(is.na(dm_test(rnorm(5), rnorm(5))$statistic))
