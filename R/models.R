@@ -276,15 +276,23 @@ model_garch_var <- function() {
   )
 }
 
-# HAR-RV (Corsi, 2009): regress future variance on daily, weekly and monthly
-# averages of realised variance. `target` selects what is regressed on the
-# HAR components: Garman-Klass RV ("gk") or squared returns ("r2").
+# HAR-RV (Corsi, 2009) in logarithms: regress the log of future variance on
+# the logs of the daily, weekly and monthly averages of Garman-Klass realised
+# variance. The log form keeps forecasts positive and removes the heavy
+# right tail of the variance target; the retransformation applies the usual
+# lognormal bias correction exp(sigma^2 / 2). `target` selects what is
+# regressed on the HAR components: Garman-Klass RV ("gk") or squared
+# returns ("r2").
+har_floor <- 1e-10
+
 har_design <- function(train, h, target = c("gk", "r2")) {
   target <- match.arg(target)
   y <- forward_variance(train, h)[[target]]
-  x <- data.frame(rv_d = train$rv_gk, rv_w = train$rv_5, rv_m = train$rv_21)
+  x <- data.frame(rv_d = log(pmax(train$rv_gk, har_floor)),
+                  rv_w = log(pmax(train$rv_5, har_floor)),
+                  rv_m = log(pmax(train$rv_21, har_floor)))
   ok <- stats::complete.cases(x) & !is.na(y)
-  list(y = y[ok], x = x[ok, ], x_last = x[nrow(x), ], n = sum(ok))
+  list(y = log(pmax(y[ok], har_floor)), x = x[ok, ], x_last = x[nrow(x), ], n = sum(ok))
 }
 
 model_har <- function(target = c("gk", "r2")) {
@@ -292,20 +300,21 @@ model_har <- function(target = c("gk", "r2")) {
   new_model(
     name = paste0("har_", target), task = "volatility", family = "statistical",
     description = sprintf(
-      "HAR-RV on Garman-Klass components, target = %s",
+      "Log-HAR-RV on Garman-Klass components, target = %s",
       if (target == "gk") "future Garman-Klass variance" else "future squared returns"
     ),
     fit = function(train, h) {
       d <- har_design(train, h, target)
       if (d$n < 100) return(NULL)
-      stats::lm(y ~ rv_d + rv_w + rv_m, data = data.frame(y = d$y, d$x))
+      fit <- stats::lm(y ~ rv_d + rv_w + rv_m, data = data.frame(y = d$y, d$x))
+      list(fit = fit, s2 = stats::sigma(fit)^2)
     },
     predict = function(fit, train, h) {
       if (is.null(fit)) return(list(var = NA_real_))
       d <- har_design(train, h, target)
       if (any(is.na(d$x_last))) return(list(var = NA_real_))
-      p <- as.numeric(stats::predict(fit, newdata = d$x_last))
-      list(var = max(p, 1e-8))
+      p <- as.numeric(stats::predict(fit$fit, newdata = d$x_last))
+      list(var = exp(p + fit$s2 / 2))
     }
   )
 }

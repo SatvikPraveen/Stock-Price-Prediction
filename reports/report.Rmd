@@ -20,6 +20,7 @@ cfg <- yaml::read_yaml(file.path(rd, "config.yml"))
 ret <- read.csv(file.path(rd, "leaderboard_return.csv"))
 vol <- read.csv(file.path(rd, "leaderboard_volatility.csv"))
 strat <- read.csv(file.path(rd, "strategy.csv"))
+drift <- read.csv(file.path(rd, "leaderboard_return_vs_drift.csv"))
 fmt <- function(x, d = 4) formatC(x, digits = d, format = "f")
 pval <- function(p) ifelse(is.na(p), "n/a", ifelse(p < 0.001, "<0.001", fmt(p, 3)))
 pooled_ret <- ret[ret$ticker == "POOLED", ]
@@ -69,6 +70,17 @@ d <- pooled_ret[order(pooled_ret$h, pooled_ret$rmse),
 d$rmse <- fmt(d$rmse, 5); d$mae <- fmt(d$mae, 5); d$oos_r2 <- fmt(d$oos_r2, 4)
 d$dir_acc <- fmt(d$dir_acc, 3); d$pt_p <- pval(d$pt_p); d$dm_p <- pval(d$dm_p)
 d$crps <- fmt(d$crps, 5); d$coverage_95 <- fmt(d$coverage_95, 3); d$winkler_95 <- fmt(d$winkler_95, 4)
+knitr::kable(d, row.names = FALSE)
+```
+
+### Against the random walk with drift
+
+A positive expected return is enough to beat a zero-return benchmark over a long bull market. The table below repeats the comparison with the expanding-window mean (`hist_mean`) as benchmark, which asks whether a model adds anything beyond the unconditional drift.
+
+```{r pooled-drift}
+d <- drift[drift$ticker == "POOLED", c("h", "model", "n", "rmse", "oos_r2", "dm_p")]
+d <- d[order(d$h, d$rmse), ]
+d$rmse <- fmt(d$rmse, 5); d$oos_r2 <- fmt(d$oos_r2, 4); d$dm_p <- pval(d$dm_p)
 knitr::kable(d, row.names = FALSE)
 ```
 

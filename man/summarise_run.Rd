@@ -17,7 +17,9 @@ summarise_run(run_dir, latest_dir = "results/latest", cost_bps = 5)
 A list with the evaluation tables (invisibly).
 }
 \description{
-Writes \code{leaderboard_return.csv}, \code{leaderboard_volatility.csv},
+Writes \code{leaderboard_return.csv} (benchmark: random walk),
+\code{leaderboard_return_vs_drift.csv} (benchmark: random walk with drift,
+i.e. \code{hist_mean}), \code{leaderboard_volatility.csv},
 \code{strategy.csv}, \code{cumulative_sse.csv}, \code{summary.json} and a \verb{figures/}
 folder into the run directory, and optionally mirrors them into
 \verb{results/latest/}.

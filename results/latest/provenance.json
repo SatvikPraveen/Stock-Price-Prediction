@@ -1,7 +1,7 @@
 {
-  "run_id": "quick",
-  "git_sha": "c8e40fc",
-  "finished_at": "2026-09-26T23:47:36-0400",
+  "run_id": "full-20260927",
+  "git_sha": "143ffde",
+  "finished_at": "2026-09-27T00:40:53-0400",
   "r_version": "R version 4.5.2 (2025-10-31)",
   "stockcast_version": "1.0.0",
   "manifest": {

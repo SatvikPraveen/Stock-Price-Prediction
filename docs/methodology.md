@@ -85,8 +85,8 @@ Every model exposes `fit(train, h)` and `predict(fit, train, h)`; see
 | `hist_var` | benchmark | Rolling 21-day sample variance |
 | `ewma` | benchmark | RiskMetrics EWMA, lambda 0.94 |
 | `garch11` | statistical | GARCH(1,1), Student-t innovations |
-| `har_gk` | statistical | HAR-RV (Corsi 2009) on Garman-Klass components, GK target |
-| `har_r2` | statistical | HAR components as regressors, squared-return target |
+| `har_gk` | statistical | Log-HAR-RV (Corsi 2009) on Garman-Klass components, GK target, lognormal bias correction |
+| `har_r2` | statistical | Log-HAR components as regressors, squared-return target |
 
 ## 6. Walk-forward protocol
 
@@ -123,6 +123,10 @@ the model and the benchmark produced a finite forecast.
 * Diebold-Mariano (1995) test of equal squared-error loss against the
   random walk, with the Harvey-Leybourne-Newbold (1997) small-sample
   correction and `h-1` autocovariance terms for overlapping targets
+* The same comparison against the random walk **with drift**
+  (`hist_mean`), because over a long bull market any model that captures
+  a positive unconditional mean beats a zero-return forecast; the
+  drift benchmark asks whether a model adds anything beyond that
 
 **Variance forecasts**
 

@@ -10,6 +10,7 @@ cfg <- yaml::read_yaml(file.path(rd, "config.yml"))
 ret <- read.csv(file.path(rd, "leaderboard_return.csv"))
 vol <- read.csv(file.path(rd, "leaderboard_volatility.csv"))
 strat <- read.csv(file.path(rd, "strategy.csv"))
+drift <- read.csv(file.path(rd, "leaderboard_return_vs_drift.csv"))
 
 fmt <- function(x, d = 4) formatC(x, digits = d, format = "f")
 pval <- function(p) ifelse(is.na(p), "n/a", ifelse(p < 0.001, "<0.001", fmt(p, 3)))
@@ -22,6 +23,9 @@ md_table <- function(df) {
 
 pr <- ret[ret$ticker == "POOLED" & ret$h == 1, ]
 pr <- pr[order(pr$rmse), ]
+pd <- drift[drift$ticker == "POOLED" & drift$h == 1, ]
+pr$dm_p_drift <- pd$dm_p[match(pr$model, pd$model)]
+pr$oos_r2_drift <- pd$oos_r2[match(pr$model, pd$model)]
 ret_tbl <- data.frame(
   Model = pr$model,
   RMSE = fmt(pr$rmse, 5),
@@ -29,11 +33,14 @@ ret_tbl <- data.frame(
   `Dir. acc.` = fmt(pr$dir_acc, 3),
   `PT p` = pval(pr$pt_p),
   `DM p vs RW` = pval(pr$dm_p),
+  `OOS R² vs drift` = fmt(pr$oos_r2_drift, 4),
+  `DM p vs drift` = pval(pr$dm_p_drift),
   CRPS = fmt(pr$crps, 5),
   `95% cov.` = fmt(pr$coverage_95, 3),
   check.names = FALSE
 )
 ret_tbl$`Dir. acc.`[ret_tbl$Model == "naive_zero"] <- "–"
+ret_tbl[ret_tbl$Model == "hist_mean", c("OOS R² vs drift", "DM p vs drift")] <- "–"
 
 pv <- vol[vol$ticker == "POOLED" & vol$h == 1, ]
 pv <- pv[order(pv$qlike_r2), ]
@@ -60,6 +67,8 @@ strat_tbl <- data.frame(
 h1 <- pr[pr$model != "naive_zero", ]
 beat <- h1$model[!is.na(h1$dm_p) & h1$dm_p < 0.05 & h1$oos_r2 > 0]
 worse <- h1$model[!is.na(h1$dm_p) & h1$dm_p < 0.05 & h1$oos_r2 < 0]
+hd <- h1[h1$model != "hist_mean", ]
+beat_drift <- hd$model[!is.na(hd$dm_p_drift) & hd$dm_p_drift < 0.05 & hd$oos_r2_drift > 0]
 vbest <- pv[pv$model != "hist_var", ][1, ]
 n_sig_vol <- sum(pv$model != "hist_var" & !is.na(pv$dm_qlike_p_r2) & pv$dm_qlike_p_r2 < 0.05 &
                    pv$qlike_r2 < pv$qlike_r2[pv$model == "hist_var"])
@@ -76,13 +85,17 @@ section <- paste0(
   "; ", length(worse), if (length(worse) == 1) " is" else " are", " significantly worse",
   if (length(worse)) paste0(" (", paste(worse, collapse = ", "), ")") else "",
   ". The best out-of-sample R² is ", fmt(max(h1$oos_r2), 4), " (", h1$model[which.max(h1$oos_r2)], ").",
+  " Against the random walk **with drift** (the expanding-window mean, `hist_mean`), ",
+  length(beat_drift), " of ", nrow(hd), " models are significantly better",
+  if (length(beat_drift)) paste0(" (", paste(beat_drift, collapse = ", "), ")") else "", ".",
   " For volatility, ", n_sig_vol, " of ", nrow(pv) - 1, " models beat the rolling-variance benchmark",
   " at the 5% level; the best is **", vbest$model, "** (QLIKE ", fmt(vbest$qlike_r2, 3), " vs ",
   fmt(pv$qlike_r2[pv$model == "hist_var"], 3), ", DM p ", pval(vbest$dm_qlike_p_r2), ").\n\n",
   "#### Return forecasts (h = 1, pooled)\n\n", md_table(ret_tbl), "\n\n",
-  "`OOS R²` is relative to the random walk (Campbell-Thompson); `DM p` is the two-sided Diebold-Mariano",
-  " p-value with the HLN correction; `PT p` is the Pesaran-Timmermann directional test; `CRPS` scores",
-  " the Gaussian predictive distribution.\n\n",
+  "`OOS R²` is relative to the zero-return random walk (Campbell-Thompson) or to the random walk",
+  " with drift; `DM p` is the two-sided Diebold-Mariano p-value with the HLN correction; `PT p` is",
+  " the Pesaran-Timmermann directional test (undefined when a model's forecast sign never changes);",
+  " `CRPS` scores the Gaussian predictive distribution.\n\n",
   "#### Variance forecasts (h = 1, pooled)\n\n", md_table(vol_tbl), "\n\n",
   "QLIKE is reported against squared returns (r², unbiased proxy) and Garman-Klass realised variance",
   " (GK, precise but excludes overnight moves); DM tests are against `hist_var`.\n\n",

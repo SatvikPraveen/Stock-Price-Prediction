@@ -82,7 +82,9 @@ plot_equity <- function(sr) {
 
 #' Summarise a run: evaluation tables, strategy backtest and figures
 #'
-#' Writes `leaderboard_return.csv`, `leaderboard_volatility.csv`,
+#' Writes `leaderboard_return.csv` (benchmark: random walk),
+#' `leaderboard_return_vs_drift.csv` (benchmark: random walk with drift,
+#' i.e. `hist_mean`), `leaderboard_volatility.csv`,
 #' `strategy.csv`, `cumulative_sse.csv`, `summary.json` and a `figures/`
 #' folder into the run directory, and optionally mirrors them into
 #' `results/latest/`.
@@ -95,6 +97,9 @@ plot_equity <- function(sr) {
 summarise_run <- function(run_dir, latest_dir = "results/latest", cost_bps = 5) {
   fc <- readRDS(file.path(run_dir, "forecasts.rds"))
   ev <- evaluate_forecasts(fc)
+  ev_drift <- evaluate_forecasts(fc[fc$task == "return", ],
+                                 benchmarks = list(return = "hist_mean"))
+  ev_drift <- ev_drift[, colSums(!is.na(ev_drift)) > 0]
   ev_ret <- ev[ev$task == "return", ]
   ev_vol <- ev[ev$task == "volatility", ]
   ev_ret <- ev_ret[, colSums(!is.na(ev_ret)) > 0]
@@ -106,6 +111,7 @@ summarise_run <- function(run_dir, latest_dir = "results/latest", cost_bps = 5) 
   cd <- cumulative_sse_diff(fc, h = 1)
 
   write.csv(ev_ret, file.path(run_dir, "leaderboard_return.csv"), row.names = FALSE)
+  write.csv(ev_drift, file.path(run_dir, "leaderboard_return_vs_drift.csv"), row.names = FALSE)
   write.csv(ev_vol, file.path(run_dir, "leaderboard_volatility.csv"), row.names = FALSE)
   write.csv(strat_all, file.path(run_dir, "strategy.csv"), row.names = FALSE)
   write.csv(cd, file.path(run_dir, "cumulative_sse.csv"), row.names = FALSE)
@@ -159,7 +165,8 @@ summarise_run <- function(run_dir, latest_dir = "results/latest", cost_bps = 5) 
   if (!is.null(latest_dir)) {
     dir.create(latest_dir, recursive = TRUE, showWarnings = FALSE)
     unlink(list.files(latest_dir, full.names = TRUE), recursive = TRUE)
-    files <- c("leaderboard_return.csv", "leaderboard_volatility.csv", "strategy.csv",
+    files <- c("leaderboard_return.csv", "leaderboard_return_vs_drift.csv",
+               "leaderboard_volatility.csv", "strategy.csv",
                "cumulative_sse.csv", "summary.json", "config.yml", "provenance.json",
                "sessionInfo.txt")
     file.copy(file.path(run_dir, files), latest_dir, overwrite = TRUE)
@@ -167,6 +174,7 @@ summarise_run <- function(run_dir, latest_dir = "results/latest", cost_bps = 5) 
     file.copy(list.files(fig_dir, full.names = TRUE), file.path(latest_dir, "figures"),
               overwrite = TRUE)
   }
-  invisible(list(return = ev_ret, volatility = ev_vol, strategy = strat_all,
+  invisible(list(return = ev_ret, return_vs_drift = ev_drift, volatility = ev_vol,
+                 strategy = strat_all,
                  cumulative = cd, summary = summary))
 }
