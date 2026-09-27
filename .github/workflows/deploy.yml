@@ -10,6 +10,12 @@ on:
 permissions:
   contents: read
 
+# shinyapps.io rejects a deploy while another is in progress, so never run
+# two deploys concurrently; queue them instead of cancelling.
+concurrency:
+  group: shinyapps-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Deploy to shinyapps.io
