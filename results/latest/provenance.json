@@ -1,0 +1,109 @@
+{
+  "run_id": "quick",
+  "git_sha": "c8e40fc",
+  "finished_at": "2026-09-26T23:47:36-0400",
+  "r_version": "R version 4.5.2 (2025-10-31)",
+  "stockcast_version": "1.0.0",
+  "manifest": {
+    "AAPL": {
+      "ticker": "AAPL",
+      "file": "AAPL.csv",
+      "sha256": "63f7117f021feea950544d2a07fc928ce908a03db13c3c253afcc850db322fad",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:50-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "MSFT": {
+      "ticker": "MSFT",
+      "file": "MSFT.csv",
+      "sha256": "7bb16f21c076e28fe72f15570f856d1192bcaeecc294e6373eb1fc20d222b8da",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:50-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "AMZN": {
+      "ticker": "AMZN",
+      "file": "AMZN.csv",
+      "sha256": "9b1d69cb9472ccdbbf56b8863a4f4898da60e2e2dc94544eb14404c8d4de70e5",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:51-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "GOOGL": {
+      "ticker": "GOOGL",
+      "file": "GOOGL.csv",
+      "sha256": "ed5aeab1e3726f28cd20cb2a2c8db331940410ff1c4a6873656ac4c605c666bc",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:51-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "NVDA": {
+      "ticker": "NVDA",
+      "file": "NVDA.csv",
+      "sha256": "b5ee7c48db6b980127e419dc9ced4bdccee470d613164a849c0e5210877d0821",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:52-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "JPM": {
+      "ticker": "JPM",
+      "file": "JPM.csv",
+      "sha256": "39b405a060b8171159f30db7632436f56f2fdbecae17dfaeaf63871977c538e9",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:52-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "XOM": {
+      "ticker": "XOM",
+      "file": "XOM.csv",
+      "sha256": "80a947486e86011a6b16f16aa6065bbc09cf177eb67d98b9e76480c0ee7e82e0",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:53-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "JNJ": {
+      "ticker": "JNJ",
+      "file": "JNJ.csv",
+      "sha256": "04b59246eeb2424b463564bc88b8f5a10ab04618193a58577ba29030585d4836",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:53-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "PG": {
+      "ticker": "PG",
+      "file": "PG.csv",
+      "sha256": "73a014e7cff7714db9186a03206e285eb968398f2671bf7d071435361f39f912",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:53-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    },
+    "SPY": {
+      "ticker": "SPY",
+      "file": "SPY.csv",
+      "sha256": "1b07b601eb96cb48f4f3e3ec4c09294165ea46c7d9d1225918b27aad0f186180",
+      "rows": 4208,
+      "first_date": "2010-01-04",
+      "last_date": "2026-09-25",
+      "downloaded_at": "2026-09-26T23:33:54-0400",
+      "source": "Yahoo Finance via quantmod::getSymbols"
+    }
+  }
+}

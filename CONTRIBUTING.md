@@ -1,102 +1,53 @@
-# 🤝 Contributing Guidelines for Stock Price Prediction with RShiny
+# Contributing
 
-Thank you for considering contributing to **Stock Price Prediction with RShiny**!  
-Whether you're fixing a bug, adding a new model, improving the UI, or updating documentation — your contribution helps improve this project for everyone.
+Thanks for your interest in improving this project. It is organised as an R
+package (`stockcast`) plus an experiment pipeline and a Shiny dashboard.
 
----
-
-## 🚀 How to Contribute
-
-1. **Fork** the repository to your GitHub account.
-2. **Clone** your forked repo:
-   ```bash
-   git clone https://github.com/your-username/stock-price-prediction.git
-   cd stock-price-prediction
-   ```
-
-3. **Create a new branch** for your changes:
-
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-4. Make your changes with **clear and descriptive commits**.
-5. **Test** your changes locally, especially if you're modifying the Shiny app or prediction logic.
-6. Submit a **pull request** (PR) with:
-
-   * A brief explanation of what you’ve changed and why
-   * Screenshots or demo (if relevant)
-
----
-
-## 🧑‍💻 Code Style
-
-### For R Code:
-
-* Use **tidyverse-style** conventions (e.g., readable, pipe-based workflows).
-* Add **inline comments** for complex logic.
-* Use **consistent naming** for variables and functions.
-* Keep **UI and server logic modular** (separated where possible).
-
-### For Python Code:
-
-* Follow **PEP8** for scripts or Jupyter notebooks.
-* Use docstrings and meaningful variable names.
-
-> ✨ Tip: Update the `dependencies.R` or `requirements.txt` files if you add new packages.
-
----
-
-## 🐛 Reporting Bugs
-
-If you find a bug in the dashboard, prediction logic, or setup process:
-
-1. Open a [GitHub Issue](https://github.com/SatvikPraveen/stock-price-prediction/issues/new)
-2. Include:
-
-   * **Clear title**
-   * **Steps to reproduce**
-   * **Expected vs. actual behavior**
-   * Screenshots or error messages (if available)
-   * R or Python **version/environment info**
-
----
-
-## 💡 Feature Suggestions
-
-Want to improve or extend the project?
-You’re welcome to create an issue describing:
-
-* **What the new feature does**
-* **How it helps users**
-* **Implementation ideas** (optional but appreciated)
-
-Some great areas for contributions include:
-
-* Adding technical indicators (e.g., RSI, MACD)
-* Improving forecasting methods (ARIMA tuning, DL models)
-* Enhancing UI components (loading indicators, charts)
-* Documentation improvements and tutorials
-
----
-
-## 📂 Project Structure (Quick Reference)
+## Development setup
 
 ```bash
-stock-price-prediction/
-├── shiny_app/        # RShiny dashboard (UI + server)
-├── data/             # Raw & processed stock data
-├── notebooks/        # R/Python notebooks for EDA and modeling
-├── results/          # Forecasting plots and evaluation outputs
-├── requirements.txt  # Python dependencies (optional)
-├── dependencies.R    # R package setup
-└── README.md         # Project documentation
+git clone https://github.com/SatvikPraveen/Stock-Price-Prediction.git
+cd Stock-Price-Prediction
+make deps      # install R dependencies (uses pak)
+make install   # install the package so parallel workers can load it
+make test      # run the testthat suite (no network needed)
+make quick     # ~5-minute smoke experiment on the pinned snapshot
 ```
 
----
+`make help` lists every target. `Rscript -e 'roxygen2::roxygenise()'` (or
+`make document`) regenerates `NAMESPACE` and `man/` after editing roxygen
+comments.
 
-## 🙌 Thank You!
+## Adding a model
 
-Your contributions make this project better and help others learn and build from it.
-Let’s continue building a better stock forecasting tool, one improvement at a time! 📈💻✨
+1. Write a constructor in `R/models.R` that returns `new_model(...)` with
+   `fit(train, h)` and `predict(fit, train, h)` closures. Return models
+   must return `list(point, sd)`, volatility models `list(var)`. Between
+   refits `predict()` must hold parameters fixed and only update state.
+2. Register it in `model_registry()`.
+3. The generic test in `tests/testthat/test-models.R` will automatically
+   check that it fits and predicts on synthetic data.
+4. Run `make quick` and inspect `results/runs/quick/leaderboard_*.csv`.
 
-— **The Stock Price Prediction Team**
+## Adding a metric or test
+
+Put the function in `R/metrics.R` with a roxygen block and a citation, add
+a hand-computed or reference-implementation test in
+`tests/testthat/test-metrics.R`, and wire it into `evaluate_return_group()`
+or `evaluate_vol_group()`.
+
+## Pull requests
+
+* Keep the data snapshot untouched unless the PR is specifically about
+  refreshing it (`make data`); refreshing changes every result.
+* CI must pass: `R CMD check`, `lintr`, the test suite and the smoke
+  experiment.
+* If a change affects results, re-run `make experiment` and commit the
+  updated `results/latest/` together with the code so that the README's
+  numbers stay tied to the commit that produced them.
+* Follow the tidyverse style guide; `make lint` will tell you if you don't.
+
+## Reporting issues
+
+Please include the R version, `sessionInfo()`, the config file used and,
+if relevant, the `provenance.json` of the run.

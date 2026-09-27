@@ -1,0 +1,142 @@
+---
+title: "Walk-forward evaluation of daily equity return and volatility forecasts"
+subtitle: "Auto-generated from `results/latest`"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    df_print: paged
+params:
+  results_dir: "../results/latest"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+rd <- params$results_dir
+summ <- jsonlite::read_json(file.path(rd, "summary.json"))
+cfg <- yaml::read_yaml(file.path(rd, "config.yml"))
+ret <- read.csv(file.path(rd, "leaderboard_return.csv"))
+vol <- read.csv(file.path(rd, "leaderboard_volatility.csv"))
+strat <- read.csv(file.path(rd, "strategy.csv"))
+fmt <- function(x, d = 4) formatC(x, digits = d, format = "f")
+pval <- function(p) ifelse(is.na(p), "", ifelse(p < 0.001, "<0.001", fmt(p, 3)))
+pooled_ret <- ret[ret$ticker == "POOLED", ]
+pooled_vol <- vol[vol$ticker == "POOLED", ]
+```
+
+## Summary
+
+* **Run** `r summ$run_id` at commit `r summ$git_sha`, finished `r summ$finished_at`.
+* **Universe**: `r paste(unlist(summ$tickers), collapse = ", ")` (`r summ$n_tickers` tickers).
+* **Out-of-sample period**: `r summ$oos_start` to `r summ$oos_end`, origins every `r cfg$step` trading day(s), parameters refit every `r cfg$refit_every` origins, `r format(summ$n_forecasts, big.mark = ",")` forecasts in total.
+* **Horizons**: `r paste(unlist(summ$horizons), collapse = ", ")` trading days.
+
+```{r headline, results="asis"}
+h1 <- pooled_ret[pooled_ret$h == 1 & pooled_ret$model != "naive_zero", ]
+beat <- h1[!is.na(h1$dm_p) & h1$dm_p < 0.05 & h1$oos_r2 > 0, ]
+worse <- h1[!is.na(h1$dm_p) & h1$dm_p < 0.05 & h1$oos_r2 < 0, ]
+cat(sprintf("* **Return forecasting (h = 1, pooled)**: %d of %d models beat the random walk at the 5%% level (%s); %d are significantly *worse* (%s). The best pooled out-of-sample R² is %s (%s).\n",
+            nrow(beat), nrow(h1),
+            if (nrow(beat)) paste(beat$model, collapse = ", ") else "none",
+            nrow(worse),
+            if (nrow(worse)) paste(worse$model, collapse = ", ") else "none",
+            fmt(max(h1$oos_r2), 4), h1$model[which.max(h1$oos_r2)]))
+v1 <- pooled_vol[pooled_vol$h == 1 & pooled_vol$model != "hist_var", ]
+vbest <- v1[which.min(v1$qlike_r2), ]
+cat(sprintf("* **Volatility forecasting (h = 1, pooled)**: best QLIKE against squared returns is **%s** (%s vs %s for the rolling-variance benchmark, DM p = %s).\n",
+            vbest$model, fmt(vbest$qlike_r2, 4),
+            fmt(pooled_vol$qlike_r2[pooled_vol$h == 1 & pooled_vol$model == "hist_var"], 4),
+            pval(vbest$dm_qlike_p_r2)))
+sp <- strat[strat$ticker == "POOLED" & strat$rule == "long_flat", ]
+bh <- sp[sp$model == "buy_hold", ]
+best_s <- sp[sp$model != "buy_hold", ][which.max(sp$sharpe[sp$model != "buy_hold"]), ]
+cat(sprintf("* **Economic value (long/flat, %d bp costs, equal-weight)**: best strategy Sharpe %s (%s, SE %s) versus buy-and-hold %s (SE %s).\n",
+            cfg$cost_bps, fmt(best_s$sharpe, 2), best_s$model, fmt(best_s$sharpe_se, 2),
+            fmt(bh$sharpe, 2), fmt(bh$sharpe_se, 2)))
+```
+
+## Return forecasts
+
+Metrics are computed on the common sample of origins where both the model and the random-walk benchmark produced a forecast. `oos_r2` is the Campbell-Thompson out-of-sample R² relative to the random walk; `dm_p` is the two-sided Diebold-Mariano p-value (squared-error loss, HLN correction); `pt_p` is the one-sided Pesaran-Timmermann p-value for directional skill; `crps` scores the Gaussian predictive distribution.
+
+### Pooled across tickers
+
+```{r pooled-return}
+d <- pooled_ret[order(pooled_ret$h, pooled_ret$rmse),
+                c("h", "model", "n", "rmse", "mae", "oos_r2", "dir_acc", "pt_p", "dm_p", "crps", "coverage_95", "winkler_95")]
+d$rmse <- fmt(d$rmse, 5); d$mae <- fmt(d$mae, 5); d$oos_r2 <- fmt(d$oos_r2, 4)
+d$dir_acc <- fmt(d$dir_acc, 3); d$pt_p <- pval(d$pt_p); d$dm_p <- pval(d$dm_p)
+d$crps <- fmt(d$crps, 5); d$coverage_95 <- fmt(d$coverage_95, 3); d$winkler_95 <- fmt(d$winkler_95, 4)
+knitr::kable(d, row.names = FALSE)
+```
+
+### Per ticker, h = 1: out-of-sample R² and Diebold-Mariano p-values
+
+```{r per-ticker-return}
+d <- ret[ret$h == 1 & ret$ticker != "POOLED" & ret$model != "naive_zero", ]
+w <- reshape(d[, c("ticker", "model", "oos_r2")], idvar = "ticker", timevar = "model", direction = "wide")
+names(w) <- sub("^oos_r2\\.", "", names(w))
+w[, -1] <- lapply(w[, -1], fmt, 4)
+knitr::kable(w, row.names = FALSE, caption = "Out-of-sample R² vs. random walk")
+w <- reshape(d[, c("ticker", "model", "dm_p")], idvar = "ticker", timevar = "model", direction = "wide")
+names(w) <- sub("^dm_p\\.", "", names(w))
+w[, -1] <- lapply(w[, -1], pval)
+knitr::kable(w, row.names = FALSE, caption = "Diebold-Mariano p-values (two-sided)")
+```
+
+### When do gains (or losses) occur?
+
+```{r cum-sse, out.width="100%"}
+knitr::include_graphics(file.path(rd, "figures", "cumulative_sse_h1.png"))
+```
+
+## Volatility forecasts
+
+QLIKE and MSE are reported against two proxies: the sum of squared returns (`r2`, unbiased but noisy) and Garman-Klass realised variance (`gk`, precise but excludes overnight variance). Diebold-Mariano p-values are against the rolling 21-day variance.
+
+```{r pooled-vol}
+d <- pooled_vol[order(pooled_vol$h, pooled_vol$qlike_r2),
+                c("h", "model", "n", "qlike_r2", "dm_qlike_p_r2", "qlike_gk", "dm_qlike_p_gk", "mse_r2", "dm_mse_p_r2")]
+d$qlike_r2 <- fmt(d$qlike_r2, 4); d$qlike_gk <- fmt(d$qlike_gk, 4)
+d$dm_qlike_p_r2 <- pval(d$dm_qlike_p_r2); d$dm_qlike_p_gk <- pval(d$dm_qlike_p_gk)
+d$mse_r2 <- formatC(d$mse_r2, digits = 3, format = "e"); d$dm_mse_p_r2 <- pval(d$dm_mse_p_r2)
+knitr::kable(d, row.names = FALSE)
+```
+
+```{r qlike-fig, out.width="80%"}
+knitr::include_graphics(file.path(rd, "figures", "leaderboard_qlike.png"))
+```
+
+## Economic evaluation
+
+Equal-weight portfolio across tickers; positions from the sign of the h = 1 forecast; `r cfg$cost_bps` bp one-way costs.
+
+```{r strategy}
+d <- strat[strat$ticker == "POOLED", c("rule", "model", "ann_return", "ann_vol", "sharpe", "sharpe_se", "max_drawdown", "total_return")]
+d <- d[order(d$rule, -d$sharpe), ]
+d[, 3:8] <- lapply(d[, 3:8], fmt, 3)
+knitr::kable(d, row.names = FALSE)
+```
+
+```{r equity-fig, out.width="100%"}
+knitr::include_graphics(file.path(rd, "figures", "equity_curves.png"))
+```
+
+## Interpretation
+
+* Daily return predictability, if present, is economically tiny: out-of-sample R² values are at most a few tenths of a percent, consistent with Welch & Goyal (2008) and the broader literature.
+* A model can have a *lower* RMSE than the random walk and still not be significantly better: the DM test accounts for the sampling variability of the loss differential.
+* The STL-ETS model from the original notebook is a cautionary example: it looked excellent in an in-sample comparison but is significantly worse than a random walk out of sample, because a periodic seasonal component of period 252 fitted to a random walk is pure noise.
+* Volatility is a different story: GARCH and HAR models beat the rolling-variance benchmark decisively, which is why risk models rather than return models are what practitioners actually deploy.
+
+## Provenance
+
+```{r provenance}
+prov <- jsonlite::read_json(file.path(rd, "provenance.json"))
+cat(sprintf("run_id: %s\ngit_sha: %s\nR: %s\nstockcast: %s\n",
+            prov$run_id, prov$git_sha, prov$r_version, prov$stockcast_version))
+m <- do.call(rbind, lapply(prov$manifest, function(e) data.frame(ticker = e$ticker, rows = e$rows, last_date = e$last_date, sha256 = substr(e$sha256, 1, 16))))
+knitr::kable(m, row.names = FALSE)
+```

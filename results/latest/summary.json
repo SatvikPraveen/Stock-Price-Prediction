@@ -1,0 +1,13 @@
+{
+  "run_id": "quick",
+  "git_sha": "c8e40fc",
+  "finished_at": "2026-09-26T23:47:36-0400",
+  "n_tickers": 2,
+  "tickers": ["AAPL", "SPY"],
+  "horizons": 1,
+  "n_forecasts": 16692,
+  "oos_start": "1000",
+  "oos_end": "4206",
+  "best_return_model_h1": "random_forest",
+  "models_beating_rw_h1_p05": []
+}
