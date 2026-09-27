@@ -39,7 +39,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rsconnect, any::shiny, any::bslib, any::dygraphs, any::DT
+          extra-packages: any::rsconnect, any::shiny, any::bslib, any::dygraphs, any::DT, any::cpp11, any::RcppArmadillo, any::RcppEigen
 
       # The app is self-contained: package code, the pinned data snapshot and
       # the latest experiment tables are copied into the app bundle.
