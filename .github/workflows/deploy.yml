@@ -62,5 +62,5 @@ jobs:
             token = Sys.getenv("SHINYAPPS_TOKEN"),
             secret = Sys.getenv("SHINYAPPS_SECRET")
           )
-          rsconnect::deployApp(appDir = "shiny_app", appName = "shiny_app", forceUpdate = TRUE)
+          rsconnect::deployApp(appDir = "shiny_app", appName = "stockcast", forceUpdate = TRUE)
         shell: Rscript {0}

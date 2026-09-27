@@ -3,7 +3,7 @@
 [![R package CI](https://github.com/SatvikPraveen/Stock-Price-Prediction/actions/workflows/r-tests.yml/badge.svg)](https://github.com/SatvikPraveen/Stock-Price-Prediction/actions/workflows/r-tests.yml)
 ![License](https://img.shields.io/github/license/SatvikPraveen/stock-price-prediction)
 ![R](https://img.shields.io/badge/R-%E2%89%A5%204.2-blue?logo=r)
-[![Live app](https://img.shields.io/badge/Shiny-live%20dashboard-75AADB?logo=rstudio)](https://my-app-01.shinyapps.io/shiny_app/)
+[![Live app](https://img.shields.io/badge/Shiny-live%20dashboard-75AADB?logo=rstudio)](https://stock-prediction-app.shinyapps.io/stockcast/)
 
 A reproducible research framework, packaged as R package **`stockcast`**, that asks a precise question:
 **can standard statistical and machine-learning models forecast next-day equity returns better than a random walk once the evaluation is genuinely out of sample, and how well can their variance be forecast?**
@@ -90,7 +90,7 @@ Adding a model is one constructor returning `new_model()`; see [`CONTRIBUTING.md
 
 ## Dashboard
 
-The [live dashboard](https://my-app-01.shinyapps.io/shiny_app/) (auto-deployed from `main` after CI passes) lets you pick any ticker in the snapshot or download one live, view prices with moving averages and Bollinger bands, produce a genuine `h`-day-ahead price forecast with a 95% interval from any registered model next to the random-walk benchmark, compare GARCH conditional volatility with realised volatility, and browse the walk-forward leaderboards and tests.
+The [live dashboard](https://stock-prediction-app.shinyapps.io/stockcast/) (auto-deployed from `main` after CI passes) lets you pick any ticker in the snapshot or download one live, view prices with moving averages and Bollinger bands, produce a genuine `h`-day-ahead price forecast with a 95% interval from any registered model next to the random-walk benchmark, compare GARCH conditional volatility with realised volatility, and browse the walk-forward leaderboards and tests.
 
 ## Citation
 
