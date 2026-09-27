@@ -18,6 +18,7 @@
 #' @importFrom stats sd var lm predict coef residuals na.omit pnorm qnorm
 #'   dnorm pt setNames acf median
 #' @importFrom utils read.csv write.csv head tail packageVersion sessionInfo
+#' @importFrom ggplot2 .data
 "_PACKAGE"
 
 # Feature column names produced by make_features(); kept here so that models

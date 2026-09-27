@@ -1,0 +1,16 @@
+# Full experiment: every trading day is a forecast origin.
+# Runtime on a 10-core laptop: ~20-30 minutes. See docs/methodology.md.
+name: full
+tickers: [AAPL, MSFT, AMZN, GOOGL, NVDA, JPM, XOM, JNJ, PG, SPY]
+from: "2010-01-01"
+horizons: [1, 5]
+initial: 1000        # first training window (~4 trading years)
+step: 1              # forecast origin every trading day
+refit_every: 21      # re-estimate parameters monthly
+window: expanding
+models: null         # null = every model in the registry
+cost_bps: 5          # one-way transaction cost for the trading backtest
+workers: 9
+seed: 20240101
+cache_dir: data/snapshot
+results_dir: results

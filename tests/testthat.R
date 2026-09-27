@@ -1,7 +1,4 @@
 library(testthat)
+library(stockcast)
 
-test_check_dir <- function() {
-  testthat::test_dir("testthat", reporter = "summary")
-}
-
-test_check_dir()
+test_check("stockcast")

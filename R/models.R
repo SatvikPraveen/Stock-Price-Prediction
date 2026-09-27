@@ -207,7 +207,9 @@ garch_spec <- function(fixed = NULL) {
 
 fit_garch <- function(train) {
   r <- train$ret[!is.na(train$ret)]
-  fit <- rugarch::ugarchfit(garch_spec(), r, solver = "hybrid")
+  # rugarch warns when the Hessian is singular; the point estimates are
+  # still usable for forecasting, so we do not surface that warning.
+  fit <- suppressWarnings(rugarch::ugarchfit(garch_spec(), r, solver = "hybrid"))
   if (fit@fit$convergence != 0) return(NULL)
   as.list(rugarch::coef(fit))
 }

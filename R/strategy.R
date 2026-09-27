@@ -35,6 +35,17 @@ strategy_returns <- function(fc, rule = c("long_flat", "long_short"),
   res
 }
 
+# Append buy-and-hold rows (realised return once per ticker and date) to a
+# strategy_returns() table.
+with_buy_hold <- function(sr) {
+  bh <- unique(sr[, c("ticker", "date", "ret")])
+  bh$model <- "buy_hold"
+  bh$position <- 1
+  bh$strategy_ret <- bh$ret
+  bh$cost <- 0
+  rbind(sr, bh[, names(sr)])
+}
+
 max_drawdown <- function(log_returns) {
   eq <- exp(cumsum(log_returns))
   peak <- cummax(eq)
@@ -78,13 +89,7 @@ backtest_strategy <- function(fc, rule = c("long_flat", "long_short"),
   sr <- strategy_returns(fc, rule = rule, cost_bps = cost_bps)
   if (nrow(sr) == 0) return(data.frame())
 
-  # buy-and-hold rows: take the realised return once per (ticker, date)
-  bh <- unique(sr[, c("ticker", "date", "ret")])
-  bh$model <- "buy_hold"
-  bh$position <- 1
-  bh$strategy_ret <- bh$ret
-  bh$cost <- 0
-  all <- rbind(sr, bh[, names(sr)])
+  all <- with_buy_hold(sr)
 
   per <- split(all, list(all$ticker, all$model), drop = TRUE)
   rows <- lapply(per, function(d) {
@@ -96,7 +101,6 @@ backtest_strategy <- function(fc, rule = c("long_flat", "long_short"),
   # pooled: equal-weight average across tickers per date
   pooled <- lapply(split(all, all$model), function(d) {
     daily <- tapply(d$strategy_ret, d$date, mean)
-    pos <- tapply(abs(d$position), d$date, mean)
     cbind(data.frame(ticker = "POOLED", model = d$model[1], stringsAsFactors = FALSE),
           perf_stats(as.numeric(daily)),
           turnover_per_year = NA_real_)

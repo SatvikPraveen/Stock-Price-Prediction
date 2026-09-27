@@ -124,14 +124,13 @@ summarise_run <- function(run_dir, latest_dir = "results/latest", cost_bps = 5) 
              "leaderboard_crps.png", 9, 5)
   }
   if (nrow(ev_vol) > 0) {
-    save_fig(plot_leaderboard(ev_vol, "qlike_r2", "Pooled QLIKE of variance forecasts (squared-return proxy)"),
+    save_fig(plot_leaderboard(ev_vol, "qlike_r2",
+                              "Pooled QLIKE of variance forecasts (squared-return proxy)"),
              "leaderboard_qlike.png", 9, 5)
   }
   sr <- strategy_returns(fc, rule = "long_flat", cost_bps = cost_bps)
   if (nrow(sr) > 0) {
-    bh <- unique(sr[, c("ticker", "date", "ret")])
-    bh$model <- "buy_hold"; bh$position <- 1; bh$strategy_ret <- bh$ret; bh$cost <- 0
-    save_fig(plot_equity(rbind(sr, bh[, names(sr)])), "equity_curves.png", 10, 6)
+    save_fig(plot_equity(with_buy_hold(sr)), "equity_curves.png", 10, 6)
   }
 
   prov <- jsonlite::read_json(file.path(run_dir, "provenance.json"))
@@ -147,7 +146,10 @@ summarise_run <- function(run_dir, latest_dir = "results/latest", cost_bps = 5) 
     oos_start = format(min(fc$origin_date)),
     oos_end = format(max(fc$target_date)),
     best_return_model_h1 = if (nrow(pooled_ret)) pooled_ret$model[which.min(pooled_ret$rmse)] else NA,
-    models_beating_rw_h1_p05 = if (nrow(pooled_ret)) pooled_ret$model[pooled_ret$dm_p < 0.05 & pooled_ret$oos_r2 > 0 & !is.na(pooled_ret$dm_p)] else character(0)
+    models_beating_rw_h1_p05 = if (nrow(pooled_ret)) {
+      sig <- !is.na(pooled_ret$dm_p) & pooled_ret$dm_p < 0.05 & pooled_ret$oos_r2 > 0
+      pooled_ret$model[sig]
+    } else character(0)
   )
   jsonlite::write_json(summary, file.path(run_dir, "summary.json"),
                        auto_unbox = TRUE, pretty = TRUE)

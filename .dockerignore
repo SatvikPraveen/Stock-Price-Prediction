@@ -1,0 +1,5 @@
+.git
+results/runs
+reports/*.html
+*.Rcheck
+.Rproj.user

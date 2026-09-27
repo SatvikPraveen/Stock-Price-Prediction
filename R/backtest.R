@@ -29,7 +29,7 @@
 #' @export
 walk_forward <- function(feat, models, h = 1, initial = 1000, step = 1,
                          refit_every = 21, window = c("expanding", "sliding"),
-                         window_size = initial, ticker = NA_character_,
+                         window_size = initial, ticker = "series",
                          progress = NULL) {
   window <- match.arg(window)
   n <- nrow(feat)
@@ -171,8 +171,15 @@ run_experiment <- function(cfg = default_config(), run_id = NULL, quiet = FALSE)
 
   old_plan <- future::plan()
   on.exit(future::plan(old_plan), add = TRUE)
-  if (cfg$workers > 1) {
-    future::plan(future::multisession, workers = cfg$workers)
+  workers <- cfg$workers
+  if (workers > 1 && !package_installed("stockcast")) {
+    warning("stockcast is not installed in .libPaths(); parallel workers cannot ",
+            "load it. Falling back to a single process. Run `make install` ",
+            "(R CMD INSTALL .) to enable parallel runs.", call. = FALSE, immediate. = TRUE)
+    workers <- 1L
+  }
+  if (workers > 1) {
+    future::plan(future::multisession, workers = workers)
   } else {
     future::plan(future::sequential)
   }
@@ -211,3 +218,9 @@ run_experiment <- function(cfg = default_config(), run_id = NULL, quiet = FALSE)
 }
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
+
+# TRUE if the package is installed in a library (as opposed to only loaded
+# from source with pkgload::load_all()), which is what background workers need.
+package_installed <- function(pkg) {
+  any(dir.exists(file.path(.libPaths(), pkg)))
+}

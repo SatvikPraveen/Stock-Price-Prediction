@@ -36,6 +36,7 @@ export(summarise_run)
 export(walk_forward)
 export(winkler)
 export(write_snapshot)
+importFrom(ggplot2,.data)
 importFrom(stats,
   acf,
   coef,

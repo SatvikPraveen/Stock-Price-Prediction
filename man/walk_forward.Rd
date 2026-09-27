@@ -13,7 +13,7 @@ walk_forward(
   refit_every = 21,
   window = c("expanding", "sliding"),
   window_size = initial,
-  ticker = NA_character_,
+  ticker = "series",
   progress = NULL
 )
 }

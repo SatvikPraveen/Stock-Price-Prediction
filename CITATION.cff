@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it as below."
+title: "stockcast: walk-forward evaluation of daily equity return and volatility forecasts"
+type: software
+authors:
+  - family-names: Praveen
+    given-names: Satvik
+    email: satvikpraveen@usf.edu
+version: 1.0.0
+date-released: 2026-09-27
+license: MIT
+repository-code: "https://github.com/SatvikPraveen/Stock-Price-Prediction"
+keywords:
+  - forecasting
+  - finance
+  - time series
+  - GARCH
+  - Diebold-Mariano
+  - walk-forward validation
+  - R

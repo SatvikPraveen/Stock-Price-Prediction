@@ -221,9 +221,21 @@ evaluate_return_group <- function(a, b, h) {
     pt_p = pt$p_value,
     dm_stat = dm$statistic,
     dm_p = dm$p_value,
-    crps = if (any(has_sd)) mean(crps_normal(a$actual_ret[has_sd], a$point[has_sd], a$sd[has_sd])) else NA_real_,
-    coverage_95 = if (any(has_sd)) coverage(a$actual_ret[has_sd], lower[has_sd], upper[has_sd]) else NA_real_,
-    winkler_95 = if (any(has_sd)) mean(winkler(a$actual_ret[has_sd], lower[has_sd], upper[has_sd])) else NA_real_,
+    crps = if (any(has_sd)) {
+      mean(crps_normal(a$actual_ret[has_sd], a$point[has_sd], a$sd[has_sd]))
+    } else {
+      NA_real_
+    },
+    coverage_95 = if (any(has_sd)) {
+      coverage(a$actual_ret[has_sd], lower[has_sd], upper[has_sd])
+    } else {
+      NA_real_
+    },
+    winkler_95 = if (any(has_sd)) {
+      mean(winkler(a$actual_ret[has_sd], lower[has_sd], upper[has_sd]))
+    } else {
+      NA_real_
+    },
     refits = sum(a$refit),
     mean_fit_secs = mean(a$fit_secs, na.rm = TRUE),
     errors = sum(!is.na(a$error))
@@ -266,6 +278,7 @@ evaluate_vol_group <- function(a, b, h) {
 evaluate_forecasts <- function(fc, benchmarks = list(return = "naive_zero",
                                                      volatility = "hist_var")) {
   fc$ticker <- as.character(fc$ticker)
+  fc$ticker[is.na(fc$ticker)] <- "series"
   groups <- unique(fc[, c("h", "task", "model")])
   tickers <- c(unique(fc$ticker), "POOLED")
   out <- list()
@@ -289,7 +302,18 @@ evaluate_forecasts <- function(fc, benchmarks = list(return = "naive_zero",
       )
     }
   }
-  res <- do.call(rbind, out)
+  res <- rbind_fill(out)
   rownames(res) <- NULL
   res
+}
+
+# rbind data frames with differing columns, filling absent ones with NA.
+rbind_fill <- function(dfs) {
+  dfs <- Filter(Negate(is.null), dfs)
+  if (length(dfs) == 0) return(data.frame())
+  cols <- unique(unlist(lapply(dfs, names)))
+  do.call(rbind, lapply(dfs, function(d) {
+    for (cc in setdiff(cols, names(d))) d[[cc]] <- NA
+    d[, cols]
+  }))
 }
