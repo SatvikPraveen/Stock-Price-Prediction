@@ -1,7 +1,7 @@
 # Reproducible environment for the stockcast experiments.
 # CRAN is pinned to a dated Posit Package Manager snapshot so that package
 # versions are frozen; R itself is pinned by the base image tag.
-FROM rocker/r-ver:4.5.2
+FROM rocker/r-ver:4.6.1
 
 ARG CRAN_DATE=2026-09-01
 ENV CRAN="https://packagemanager.posit.co/cran/__linux__/noble/${CRAN_DATE}"
