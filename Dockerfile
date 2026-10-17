@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /work
 COPY DESCRIPTION .
-RUN R -q -e 'install.packages("pak"); pak::local_install_deps(dependencies = TRUE)'
+RUN R -q -e 'install.packages(c("pak", "roxygen2")); pak::local_install_deps(dependencies = TRUE)'
 
 COPY . .
 RUN R -q -e 'roxygen2::roxygenise()' && R CMD INSTALL --no-multiarch --no-docs .

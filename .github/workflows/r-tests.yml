@@ -68,3 +68,11 @@ jobs:
           name: smoke-experiment
           path: results/runs/ci-smoke
           retention-days: 14
+
+  docker:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the reproducible image
+        run: docker build -t stockcast .
