@@ -43,9 +43,15 @@ jobs:
         with:
           use-public-rspm: true
 
+      # Plain (standard) refs, not `any::`. A package pak installs from an
+      # `any::` ref gets `RemoteType: any`; renv then records it with
+      # Source "any" and the bare repository name "RSPM", rsconnect passes that
+      # through to the manifest, and shinyapps.io fails with
+      # "Unsupported url scheme: RSPM/src/contrib/...". Standard refs are
+      # recorded with the full Package Manager URL.
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rsconnect, any::shiny, any::bslib, any::dygraphs, any::DT, any::cpp11, any::RcppArmadillo, any::RcppEigen
+          extra-packages: rsconnect, shiny, bslib, dygraphs, DT, cpp11, RcppArmadillo, RcppEigen
 
       # The app is self-contained: package code, the pinned data snapshot and
       # the latest experiment tables are copied into the app bundle.
