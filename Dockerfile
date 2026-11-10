@@ -3,9 +3,13 @@
 # versions are frozen; R itself is pinned by the base image tag.
 FROM rocker/r-ver:4.6.2
 
+# The binary repo must match the base image's Ubuntu release (rocker moved
+# from noble to resolute in 4.6.2); binaries built for another release fail to
+# load their system libraries.
 ARG CRAN_DATE=2026-09-01
-ENV CRAN="https://packagemanager.posit.co/cran/__linux__/noble/${CRAN_DATE}"
-RUN echo "options(repos = c(CRAN = '${CRAN}'))" >> /usr/local/lib/R/etc/Rprofile.site
+RUN . /etc/os-release \
+    && echo "options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/${VERSION_CODENAME}/${CRAN_DATE}'))" \
+       >> /usr/local/lib/R/etc/Rprofile.site
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
       make git pandoc libcurl4-openssl-dev libssl-dev libxml2-dev \
